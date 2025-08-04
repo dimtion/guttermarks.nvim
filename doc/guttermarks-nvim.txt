@@ -1,0 +1,231 @@
+                                                            *guttermarks-nvim*
+*guttermarks-nvim.txt*	Display marks in the buffer gutter
+
+Author: Loïc Carr <a-dev@carr.bzh>
+
+CONTENTS							*guttermarks-contents*
+
+1. Introduction				|guttermarks-introduction|
+2. Requirements				|guttermarks-requirements|
+3. Installation				|guttermarks-installation|
+4. Configuration			|guttermarks-configuration|
+5. Commands				    |guttermarks-commands|
+6. Functions				|guttermarks-functions|
+7. Highlights				|guttermarks-highlights|
+8. Examples				    |guttermarks-examples|
+9. Changelog				|guttermarks-changelog|
+
+==============================================================================
+1. INTRODUCTION					*guttermarks-introduction*
+
+Guttermarks is a simple Neovim plugin that displays marks in the buffer gutter
+as signs. It supports local marks, global marks, and special marks with
+customizable appearance and behavior.
+
+Features:~
+• Display local marks (a-z) in the gutter
+• Display global marks (A-Z) in the gutter
+• Optional display of special marks (numbers, symbols)
+• Configurable sign text and highlight groups
+• Automatic refresh
+• Per-filetype & buffertype exclusion support
+
+==============================================================================
+2. REQUIREMENTS					*guttermarks-requirements*
+
+• Neovim 0.7+ (uses extmarks API)
+
+==============================================================================
+3. INSTALLATION					*guttermarks-installation*
+
+Using lazy.nvim:~
+>lua
+    {
+      "username/guttermarks.nvim",
+      event = "VeryLazy",
+    }
+<
+
+
+==============================================================================
+4. CONFIGURATION				*guttermarks-configuration*
+
+Setup function:~
+>lua
+    require("guttermarks").setup(opts)
+<
+
+The `opts` table can contain the following keys:
+
+						*guttermarks-local_mark*
+local_mark~
+    Configuration for local marks (a-z).
+
+    Fields:~
+    • enabled (boolean): Enable local marks display (default: true)
+    • sign (string|nil): Custom sign text (default: nil, uses mark letter)
+    • highlight_group (string): Highlight group name (default: "GutterMarksLocal")
+    • priority (number): Sign priority (default: 10)
+
+						*guttermarks-global_mark*
+global_mark~
+    Configuration for global marks (A-Z).
+
+    Fields:~
+    • enabled (boolean): Enable global marks display (default: true)
+    • sign (string|nil): Custom sign text (default: nil, uses mark letter)
+    • highlight_group (string): Highlight group name (default:
+      "GutterMarksGlobal")
+    • priority (number): Sign priority (default: 11)
+
+						*guttermarks-special_mark*
+special_mark~
+    Configuration for special marks.
+
+    Fields:~
+    • enabled (boolean): Enable special marks display (default: false)
+    • sign (string|nil): Custom sign text (default: nil, uses mark character)
+    • marks (table): List of special marks to display
+      (default: { "'", "^", ".", "[", "]", "<", ">", '"', "`", "\"", "0"-"9" })
+    • highlight_group (string): Highlight group name (default:
+      "GutterMarksGlobal")
+    • priority (number): Sign priority (default: 10)
+
+						*guttermarks-autocmd_triggers*
+autocmd_triggers~
+    List of autocmd events that trigger mark refresh.
+    Default: { "BufEnter", "BufWritePost", "TextChanged", "TextChangedI" }
+
+						*guttermarks-excluded_filetypes*
+excluded_filetypes~
+    List of filetypes where guttermarks should be disabled.
+    Default: { "" }
+
+						*guttermarks-disabled_filetype*
+disabled_filetype~
+    Alias for excluded_filetypes (deprecated, use excluded_filetypes instead).
+    Default: { "" }
+
+==============================================================================
+5. COMMANDS					*guttermarks-commands*
+
+						*:GutterMarksToggle*
+:GutterMarksToggle
+    Toggle guttermarks display on/off.
+
+						*:GutterMarksEnable*
+:GutterMarksEnable
+    Enable guttermarks display.
+
+						*:GutterMarksDisable*
+:GutterMarksDisable
+    Disable guttermarks display.
+
+==============================================================================
+6. FUNCTIONS					*guttermarks-functions*
+
+						*guttermarks.setup()*
+guttermarks.setup({opts})
+    Initialize the plugin with the given configuration.
+
+    Parameters:~
+        {opts} (table|nil) Configuration options
+
+						*guttermarks.refresh()*
+guttermarks.refresh()
+    Manually refresh marks display for the current buffer.
+
+						*guttermarks.enable()*
+guttermarks.enable({is_enabled})
+    Enable or disable guttermarks display.
+
+    Parameters:~
+        {is_enabled} (boolean) True to enable, false to disable
+
+						*guttermarks.toggle()*
+guttermarks.toggle()
+    Toggle guttermarks display on/off.
+
+==============================================================================
+7. HIGHLIGHTS					*guttermarks-highlights*
+
+The following highlight groups are used:
+
+						*hl-GutterMarksLocal*
+GutterMarksLocal~
+    Highlight group for local marks (a-z).
+
+						*hl-GutterMarksGlobal*
+GutterMarksGlobal~
+    Highlight group for global marks (A-Z).
+
+						*hl-GutterMarksSpecial*
+GutterMarksSpecial~
+    Highlight group for special marks (' > 0-9).
+
+You can customize these highlight groups in your colorscheme or init.lua:
+>lua
+    vim.api.nvim_set_hl(0, "GutterMarksLocal", { fg = "#ffff00" })
+    vim.api.nvim_set_hl(0, "GutterMarksGlobal", { fg = "#ff0000", bold = true })
+    vim.api.nvim_set_hl(0, "GutterMarksSpecial", { fg = "#ff0000", bold = true })
+<
+
+==============================================================================
+8. EXAMPLES					*guttermarks-examples*
+
+Basic setup:~
+>lua
+    require("guttermarks").setup()
+<
+
+Custom configuration:~
+>lua
+    require("guttermarks").setup({
+      local_mark = {
+        enabled = true,
+        sign = "•",
+        highlight_group = "DiagnosticInfo",
+        priority = 10,
+      },
+      global_mark = {
+        enabled = true,
+        sign = "●",
+        highlight_group = "DiagnosticWarn",
+        priority = 15,
+      },
+      special_mark = {
+        enabled = true,
+        sign = "★",
+        marks = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" },
+        highlight_group = "DiagnosticError",
+        priority = 12,
+      },
+      excluded_filetypes = { "help", "dashboard", "NvimTree" },
+      autocmd_triggers = { "BufEnter", "BufWritePost" },
+    })
+<
+
+Disable for specific filetypes:~
+>lua
+    require("guttermarks").setup({
+      excluded_filetypes = { "help", "qf", "fugitive", "gitcommit" },
+    })
+<
+
+Manual refresh after setting marks programmatically:~
+>lua
+    -- Set a mark programmatically
+    vim.api.nvim_buf_set_mark(0, "a", 10, 0, {})
+    -- Refresh the display
+    require("guttermarks").refresh()
+<
+
+See lua/guttermarks/default_config.lua for all configuration options.
+
+==============================================================================
+9. CHANGELOG					*guttermarks-changelog*
+
+Initial release:~
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
