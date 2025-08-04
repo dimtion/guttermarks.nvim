@@ -33,26 +33,21 @@ function M.setup(opts)
     group = group,
     callback = function()
       local cmdline = vim.fn.histget("cmd", -1)
-      -- Check if the command was a mark-related command
       if cmdline:match("^m[a-zA-Z0-9]") or cmdline:match("^delm") then
         vim.schedule(M.refresh)
       end
     end,
   })
 
-  local excluded_filetypes = {}
-  for _, ft in ipairs(config.excluded_filetypes or {}) do
-    excluded_filetypes[ft] = true
+  M.excluded_filetypes = {}
+  for _, ft in ipairs(config.excluded_filetypes) do
+    M.excluded_filetypes[ft] = true
   end
 
-  M.excluded_filetypes = excluded_filetypes
-
-  local excluded_buftypes = {}
-  for _, ft in ipairs(config.excluded_buftypes or {}) do
-    excluded_buftypes[ft] = true
+  M.excluded_buftypes = {}
+  for _, ft in ipairs(config.excluded_buftypes) do
+    M.excluded_buftypes[ft] = true
   end
-
-  M.excluded_buftypes = excluded_buftypes
 
   M.setup_mark_hooks()
 end

@@ -25,5 +25,5 @@ return {
     "TextChangedI",
   },
   excluded_filetypes = { "" },
-  disabled_filetype = { "" },
+  excluded_buftypes = { },
 }
