@@ -104,22 +104,18 @@ vim.api.nvim_set_hl(0, "GutterMarksSpecial", { fg = "#00ff00", italic = true })
 
 ### Enable Special Marks
 
+![](.github/img/screenshot_02.png)
+
 ```lua
 require("guttermarks").setup({
   special_mark = { enabled = true },
 })
 ```
 
-### Minimal Setup for Local Marks Only
-
-```lua
-require("guttermarks").setup({
-  global_mark = { enabled = false },
-  special_mark = { enabled = false },
-})
-```
 
 ### Using Custom Signs
+
+![](.github/img/screenshot_03.png)
 
 ```lua
 require("guttermarks").setup({
@@ -129,6 +125,15 @@ require("guttermarks").setup({
     enabled = true,
     sign = "●",
   },
+})
+```
+
+### Minimal Setup for Local Marks Only
+
+```lua
+require("guttermarks").setup({
+  global_mark = { enabled = false },
+  special_mark = { enabled = false },
 })
 ```
 
