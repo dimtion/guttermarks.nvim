@@ -126,22 +126,25 @@ function M.refresh()
   vim.api.nvim_buf_clear_namespace(bufnr, ns_id, 0, -1)
 
   local marks = get_buffer_marks(bufnr)
+  local line_count = vim.api.nvim_buf_line_count(bufnr)
 
-  for _, mark_info in ipairs(marks) do
-    local sign_config = config[mark_info.type].sign
+  for _, mark in ipairs(marks) do
+    local sign_config = config[mark.type].sign
     local sign_text
 
     if type(sign_config) == "function" then
-      sign_text = sign_config(mark_info)
+      sign_text = sign_config(mark)
     else
-      sign_text = sign_config or mark_info.mark
+      sign_text = sign_config or mark.mark
     end
 
-    vim.api.nvim_buf_set_extmark(bufnr, ns_id, mark_info.line - 1, 0, {
-      sign_text = sign_text,
-      sign_hl_group = config[mark_info.type].highlight_group,
-      priority = config[mark_info.type].priority,
-    })
+    if mark.line >= 1 and mark.line <= line_count then
+      vim.api.nvim_buf_set_extmark(bufnr, ns_id, mark.line - 1, 0, {
+        sign_text = sign_text,
+        sign_hl_group = config[mark.type].highlight_group,
+        priority = config[mark.type].priority,
+      })
+    end
   end
 end
 
