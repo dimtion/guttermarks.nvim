@@ -128,8 +128,17 @@ function M.refresh()
   local marks = get_buffer_marks(bufnr)
 
   for _, mark_info in ipairs(marks) do
+    local sign_config = config[mark_info.type].sign
+    local sign_text
+
+    if type(sign_config) == "function" then
+      sign_text = sign_config(mark_info)
+    else
+      sign_text = sign_config or mark_info.mark
+    end
+
     vim.api.nvim_buf_set_extmark(bufnr, ns_id, mark_info.line - 1, 0, {
-      sign_text = config[mark_info.type].sign or mark_info.mark,
+      sign_text = sign_text,
       sign_hl_group = config[mark_info.type].highlight_group,
       priority = config[mark_info.type].priority,
     })

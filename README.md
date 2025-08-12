@@ -15,7 +15,7 @@ behavior.
 - Configurable sign text and highlight groups
 - Automatic refresh on text changes
 
-### Why this pluging
+### Why this plugin
 
 I've been using [marks.nvim](https://github.com/chentoast/marks.nvim) and others
 to display marks in the gutter, but I don't need all the extra bells and whistle
@@ -48,34 +48,38 @@ require("guttermarks").setup()
 
 See [full default configuration](lua/guttermarks/default_config.lua).
 
-Example custom configuration:
-
+Default configuration:
 ```lua
-require("guttermarks").setup({
+{
   local_mark = {
     enabled = true,
-    sign = "•",                    -- Custom sign ([default] nil uses mark letter)
-    highlight_group = "DiagnosticInfo",
+    sign = nil,
+    highlight_group = "GutterMarksLocal",
     priority = 10,
   },
   global_mark = {
     enabled = true,
-    sign = "●",
-    highlight_group = "DiagnosticWarn",
-    priority = 15,
+    sign = nil,
+    highlight_group = "GutterMarksGlobal",
+    priority = 11,
   },
   special_mark = {
-    enabled = true,               -- Disabled by default
-    sign = "★",
-    marks = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" },
-    highlight_group = "DiagnosticError",
-    priority = 12,
+    enabled = false,
+    sign = nil,
+    marks = { "'", "^", ".", "[", "]", "<", ">", '"', "`", '"', "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" },
+    highlight_group = "GutterMarksSpecial",
+    priority = 10,
   },
-  -- Filetypes to exclude
-  excluded_filetypes = { "help", "dashboard", "NvimTree", "neo-tree" },
+  excluded_filetypes = { "" },
+  excluded_buftypes = {},
   -- Customize Autocmd events that trigger refresh (not recommended)
-  autocmd_triggers = { "BufEnter", "BufWritePost", "TextChanged", "TextChangedI" },
-})
+  autocmd_triggers = {
+    "BufEnter",
+    "BufWritePost",
+    "TextChanged",
+    "TextChangedI",
+  },
+}
 ```
 
 ## Commands
@@ -96,7 +100,7 @@ vim.api.nvim_set_hl(0, "GutterMarksGlobal", { fg = "#ff0000", bold = true })
 vim.api.nvim_set_hl(0, "GutterMarksSpecial", { fg = "#00ff00", italic = true })
 ```
 
-## Examples
+## Cookbook
 
 ### Enable Special Marks
 
@@ -128,10 +132,25 @@ require("guttermarks").setup({
 })
 ```
 
+### Function passed for sign
+
+```lua
+require("guttermarks").setup({
+  global_mark = {
+    sign = function(mark)
+      -- Show the mark letter with a prefix
+      return "G" .. mark.mark
+    end,
+  },
+})
+```
+
 ## Vim Marks cheat-sheet
 
 - Use `ma` to set local mark 'a', `mA` for global mark 'A'
 - Jump to marks with `'a` (local) or `'A` (global)
+- Use `` `a `` to jump to exact position (line and column) of mark 'a'
+- Delete mark 'a' with `:delmarks a`
 
 ## License
 
