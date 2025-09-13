@@ -24,6 +24,13 @@ return {
     "TextChanged",
     "TextChangedI",
   },
-  excluded_filetypes = { "" },
-  excluded_buftypes = {},
+  excluded_filetypes = {
+    "NvimTree",
+    "",
+  },
+  excluded_buftypes = {
+    "terminal",
+    "prompt",
+    "quickfix",
+  },
 }
