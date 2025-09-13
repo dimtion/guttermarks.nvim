@@ -72,7 +72,7 @@ Default configuration:
   },
   excluded_filetypes = { "" },
   excluded_buftypes = {},
-  -- Customize Autocmd events that trigger refresh (not recommended)
+  -- Advanced: Customize Autocmd events that trigger a refresh
   autocmd_triggers = {
     "BufEnter",
     "BufWritePost",
@@ -86,9 +86,10 @@ Default configuration:
 
 | Command | Description |
 |---------|-------------|
-| `:GutterMarksToggle` | Toggle guttermarks display on/off |
-| `:GutterMarksEnable` | Enable guttermarks display |
-| `:GutterMarksDisable` | Disable guttermarks display |
+| `:GutterMarks toggle` | Toggle guttermarks display on/off |
+| `:GutterMarks enable` | Enable guttermarks display |
+| `:GutterMarks disable` | Disable guttermarks display |
+| `:GutterMarks refresh` | Force refresh guttermarks display |
 
 ## Customizing Highlights
 

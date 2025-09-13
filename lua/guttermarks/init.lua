@@ -3,16 +3,13 @@
 
 local M = {}
 
-local utils = require("guttermarks.utils")
-local default_config = require("guttermarks.default_config")
-
 local ns_id = nil
 local enabled = true
 local config = {}
 
 function M.setup(opts)
   opts = opts or {}
-  config = vim.tbl_deep_extend("force", default_config, opts)
+  config = vim.tbl_deep_extend("force", require("guttermarks.default_config"), opts)
 
   ns_id = vim.api.nvim_create_namespace("marks_gutter")
 
@@ -75,6 +72,7 @@ local function add_mark(marks, bufnr, mark, type)
 end
 
 local function get_buffer_marks(bufnr)
+  local utils = require("guttermarks.utils")
   local marks = {}
 
   if config.local_mark.enabled then
@@ -112,6 +110,7 @@ local function get_buffer_marks(bufnr)
   return marks
 end
 
+---Refresh marks in current buffer
 function M.refresh()
   if not enabled then
     return
@@ -148,6 +147,8 @@ function M.refresh()
   end
 end
 
+---Enable or disable guttermarks
+---@param is_enabled boolean whether to enable or disable guttermarks
 function M.enable(is_enabled)
   enabled = is_enabled
   if enabled then
@@ -158,6 +159,7 @@ function M.enable(is_enabled)
   end
 end
 
+---Enable guttermarks if disable, disable guttermarks if enabled
 function M.toggle()
   M.enable(not enabled)
 end
