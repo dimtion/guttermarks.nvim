@@ -8,8 +8,13 @@
 
 local M = {}
 
+---@type number
 M.ns_id = nil
-M.enabled = false
+
+---@type boolean
+M.is_enabled = false
+
+---@type guttermarks.Config
 M.config = nil
 
 ---Setup the plugin configuration.
@@ -27,7 +32,7 @@ function M.init()
   end
 
   M.ns_id = vim.api.nvim_create_namespace("marks_gutter")
-  M.enabled = true
+  M.is_enabled = true
 
   vim.api.nvim_set_hl(0, M.config.local_mark.highlight_group, { default = true })
   vim.api.nvim_set_hl(0, M.config.global_mark.highlight_group, { default = true })
@@ -123,7 +128,7 @@ end
 
 ---Refresh marks in current buffer
 function M.refresh()
-  if not M.enabled then
+  if not M.is_enabled then
     return
   end
 
@@ -158,8 +163,8 @@ end
 ---Enable or disable guttermarks
 ---@param is_enabled boolean whether to enable or disable guttermarks
 function M.enable(is_enabled)
-  M.enabled = is_enabled
-  if M.enabled then
+  M.is_enabled = is_enabled
+  if M.is_enabled then
     M.refresh()
   else
     local bufnr = vim.api.nvim_get_current_buf()
@@ -169,7 +174,7 @@ end
 
 ---Enable guttermarks if disable, disable guttermarks if enabled
 function M.toggle()
-  M.enable(not M.enabled)
+  M.enable(not M.is_enabled)
 end
 
 return M

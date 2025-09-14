@@ -1,7 +1,7 @@
                                                             *guttermarks-nvim*
 *guttermarks-nvim.txt*	Display marks in the buffer gutter
 
-Author: Loïc Carr <a-dev@carr.bzh>
+Author: Loïc Carr <dev@carr.bzh>
 
 CONTENTS							*guttermarks-contents*
 
@@ -41,7 +41,7 @@ Features:~
 Using lazy.nvim:~
 >lua
     {
-      "username/guttermarks.nvim",
+      "dimtion/guttermarks.nvim",
       event = "VeryLazy",
     }
 <
@@ -109,17 +109,21 @@ disabled_filetype~
 ==============================================================================
 5. COMMANDS					*guttermarks-commands*
 
-						*:GutterMarksToggle*
-:GutterMarksToggle
+						*:GutterMarks toggle*
+:GutterMarks toggle
     Toggle guttermarks display on/off.
 
-						*:GutterMarksEnable*
-:GutterMarksEnable
+						*:GutterMarks enable*
+:GutterMarks enable
     Enable guttermarks display.
 
-						*:GutterMarksDisable*
-:GutterMarksDisable
+						*:GutterMarks disable*
+:GutterMarks disable
     Disable guttermarks display.
+
+						*:GutterMarks refresh*
+:GutterMarks refresh
+    Force refresh guttermarks.
 
 ==============================================================================
 6. FUNCTIONS					*guttermarks-functions*
@@ -149,7 +153,7 @@ guttermarks.toggle()
 ==============================================================================
 7. HIGHLIGHTS					*guttermarks-highlights*
 
-The following highlight groups are used:
+The following highlight groups are used by default:
 
 						*hl-GutterMarksLocal*
 GutterMarksLocal~
