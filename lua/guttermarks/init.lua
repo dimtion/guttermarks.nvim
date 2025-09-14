@@ -45,10 +45,12 @@ function M.init()
   vim.api.nvim_create_autocmd("CmdlineLeave", {
     group = group,
     callback = function()
-      local cmdline = vim.fn.histget("cmd", -1)
-      if cmdline:match("^m[a-zA-Z0-9]") or cmdline:match("^delm") then
-        vim.schedule(M.refresh)
-      end
+      vim.schedule(function()
+        local cmdline = vim.fn.histget("cmd", -1)
+        if cmdline:match("^m[a-zA-Z0-9]") or cmdline:match("^delm") then
+          M.refresh()
+        end
+      end)
     end,
   })
 
