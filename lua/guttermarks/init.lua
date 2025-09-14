@@ -1,14 +1,20 @@
--- guttermarks.nvim
--- A simple Neovim plugin to display marks in the buffer gutter
+--- guttermarks.nvim
+--- A simple Neovim plugin to display marks in the buffer gutter
+
+---@class guttermarks.Mark
+---@field mark string
+---@field line number
+---@field type "local_mark"|"global_mark"|"special_mark"
 
 local M = {}
 
 M.ns_id = nil
-M.enabled = true
+M.enabled = false
 M.config = nil
 
 ---Setup the plugin configuration.
 ---Overrides the default configuration with the provided config passed as a parameter
+---@param opts? guttermarks.Config
 function M.setup(opts)
   opts = opts or {}
   M.config = vim.tbl_deep_extend("force", require("guttermarks.config"), opts)
@@ -21,6 +27,7 @@ function M.init()
   end
 
   M.ns_id = vim.api.nvim_create_namespace("marks_gutter")
+  M.enabled = true
 
   vim.api.nvim_set_hl(0, M.config.local_mark.highlight_group, { default = true })
   vim.api.nvim_set_hl(0, M.config.global_mark.highlight_group, { default = true })
@@ -55,10 +62,6 @@ function M.init()
     M.excluded_buftypes[ft] = true
   end
 
-  M.setup_mark_hooks()
-end
-
-function M.setup_mark_hooks()
   vim.keymap.set("n", "m", function()
     local char = vim.fn.getchar()
     local key = vim.fn.nr2char(char)
@@ -67,19 +70,9 @@ function M.setup_mark_hooks()
   end, { desc = "Set mark (with gutter update)" })
 end
 
-local function add_mark(marks, bufnr, mark, type)
-  local pos = vim.api.nvim_buf_get_mark(bufnr, mark)
-  if pos[1] <= 0 then -- Invalid mark (line <= 0)
-    return
-  end
-
-  table.insert(marks, {
-    mark = mark,
-    line = pos[1],
-    type = type,
-  })
-end
-
+---Returns the list of enabled and valid marks in the selected buffer
+---@param bufnr number Buffer number
+---@return guttermarks.Mark[]
 local function get_buffer_marks(bufnr)
   local utils = require("guttermarks.utils")
   local marks = {}
@@ -87,7 +80,7 @@ local function get_buffer_marks(bufnr)
   if M.config.local_mark.enabled then
     for _, mark in ipairs(vim.fn.getmarklist("%")) do
       local m = mark.mark:sub(2, 3)
-      if utils.is_letter(m) then
+      if utils.is_letter(m) and utils.is_valid_mark(bufnr, mark.pos[2]) then
         table.insert(marks, {
           mark = m,
           line = mark.pos[2],
@@ -100,7 +93,7 @@ local function get_buffer_marks(bufnr)
   if M.config.global_mark.enabled then
     for _, mark in ipairs(vim.fn.getmarklist()) do
       local m = mark.mark:sub(2, 3)
-      if mark.pos[1] == bufnr and utils.is_letter(m) then
+      if mark.pos[1] == bufnr and utils.is_letter(m) and utils.is_valid_mark(bufnr, mark.pos[2]) then
         table.insert(marks, {
           mark = m,
           line = mark.pos[2],
@@ -112,7 +105,14 @@ local function get_buffer_marks(bufnr)
 
   if M.config.special_mark.enabled then
     for _, mark in ipairs(M.config.special_mark.marks) do
-      add_mark(marks, bufnr, mark, "special_mark")
+      local pos = vim.api.nvim_buf_get_mark(bufnr, mark)
+      if utils.is_valid_mark(bufnr, pos[1]) then
+        table.insert(marks, {
+          mark = mark,
+          line = pos[1],
+          type = "special_mark",
+        })
+      end
     end
   end
 
@@ -134,7 +134,6 @@ function M.refresh()
   vim.api.nvim_buf_clear_namespace(bufnr, M.ns_id, 0, -1)
 
   local marks = get_buffer_marks(bufnr)
-  local line_count = vim.api.nvim_buf_line_count(bufnr)
 
   for _, mark in ipairs(marks) do
     local sign_config = M.config[mark.type].sign
@@ -146,13 +145,11 @@ function M.refresh()
       sign_text = sign_config or mark.mark
     end
 
-    if mark.line >= 1 and mark.line <= line_count then
-      vim.api.nvim_buf_set_extmark(bufnr, M.ns_id, mark.line - 1, 0, {
-        sign_text = sign_text,
-        sign_hl_group = M.config[mark.type].highlight_group,
-        priority = M.config[mark.type].priority,
-      })
-    end
+    vim.api.nvim_buf_set_extmark(bufnr, M.ns_id, mark.line - 1, 0, {
+      sign_text = sign_text,
+      sign_hl_group = M.config[mark.type].highlight_group,
+      priority = M.config[mark.type].priority,
+    })
   end
 end
 

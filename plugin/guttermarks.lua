@@ -22,7 +22,7 @@ local function guttermarks_command(opts)
   end
 end
 
-local function guttermarks_complete(arg_lead, cmd_line, cursor_pos)
+local function guttermarks_complete(arg_lead)
   local subcommands = { "toggle", "enable", "disable", "refresh" }
   local matches = {}
 
