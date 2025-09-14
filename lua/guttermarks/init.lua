@@ -3,23 +3,32 @@
 
 local M = {}
 
-local ns_id = nil
-local enabled = true
-local config = {}
+M.ns_id = nil
+M.enabled = true
+M.config = nil
 
+---Setup the plugin configuration.
+---Overrides the default configuration with the provided config passed as a parameter
 function M.setup(opts)
   opts = opts or {}
-  config = vim.tbl_deep_extend("force", require("guttermarks.default_config"), opts)
+  M.config = vim.tbl_deep_extend("force", require("guttermarks.config"), opts)
+end
 
-  ns_id = vim.api.nvim_create_namespace("marks_gutter")
+---Configure initial hooks to use the plugin. Call this function once
+function M.init()
+  if M.config == nil then
+    M.setup()
+  end
 
-  vim.api.nvim_set_hl(0, config.local_mark.highlight_group, { default = true })
-  vim.api.nvim_set_hl(0, config.global_mark.highlight_group, { default = true })
-  vim.api.nvim_set_hl(0, config.special_mark.highlight_group, { default = true })
+  M.ns_id = vim.api.nvim_create_namespace("marks_gutter")
+
+  vim.api.nvim_set_hl(0, M.config.local_mark.highlight_group, { default = true })
+  vim.api.nvim_set_hl(0, M.config.global_mark.highlight_group, { default = true })
+  vim.api.nvim_set_hl(0, M.config.special_mark.highlight_group, { default = true })
 
   local group = vim.api.nvim_create_augroup("MarksGutter", { clear = true })
 
-  vim.api.nvim_create_autocmd(config.autocmd_triggers, {
+  vim.api.nvim_create_autocmd(M.config.autocmd_triggers, {
     group = group,
     callback = function()
       vim.schedule(M.refresh)
@@ -37,12 +46,12 @@ function M.setup(opts)
   })
 
   M.excluded_filetypes = {}
-  for _, ft in ipairs(config.excluded_filetypes) do
+  for _, ft in ipairs(M.config.excluded_filetypes) do
     M.excluded_filetypes[ft] = true
   end
 
   M.excluded_buftypes = {}
-  for _, ft in ipairs(config.excluded_buftypes) do
+  for _, ft in ipairs(M.config.excluded_buftypes) do
     M.excluded_buftypes[ft] = true
   end
 
@@ -75,7 +84,7 @@ local function get_buffer_marks(bufnr)
   local utils = require("guttermarks.utils")
   local marks = {}
 
-  if config.local_mark.enabled then
+  if M.config.local_mark.enabled then
     for _, mark in ipairs(vim.fn.getmarklist("%")) do
       local m = mark.mark:sub(2, 3)
       if utils.is_letter(m) then
@@ -88,7 +97,7 @@ local function get_buffer_marks(bufnr)
     end
   end
 
-  if config.global_mark.enabled then
+  if M.config.global_mark.enabled then
     for _, mark in ipairs(vim.fn.getmarklist()) do
       local m = mark.mark:sub(2, 3)
       if mark.pos[1] == bufnr and utils.is_letter(m) then
@@ -101,8 +110,8 @@ local function get_buffer_marks(bufnr)
     end
   end
 
-  if config.special_mark.enabled then
-    for _, mark in ipairs(config.special_mark.marks) do
+  if M.config.special_mark.enabled then
+    for _, mark in ipairs(M.config.special_mark.marks) do
       add_mark(marks, bufnr, mark, "special_mark")
     end
   end
@@ -112,7 +121,7 @@ end
 
 ---Refresh marks in current buffer
 function M.refresh()
-  if not enabled then
+  if not M.enabled then
     return
   end
 
@@ -122,13 +131,13 @@ function M.refresh()
     return
   end
 
-  vim.api.nvim_buf_clear_namespace(bufnr, ns_id, 0, -1)
+  vim.api.nvim_buf_clear_namespace(bufnr, M.ns_id, 0, -1)
 
   local marks = get_buffer_marks(bufnr)
   local line_count = vim.api.nvim_buf_line_count(bufnr)
 
   for _, mark in ipairs(marks) do
-    local sign_config = config[mark.type].sign
+    local sign_config = M.config[mark.type].sign
     local sign_text
 
     if type(sign_config) == "function" then
@@ -138,10 +147,10 @@ function M.refresh()
     end
 
     if mark.line >= 1 and mark.line <= line_count then
-      vim.api.nvim_buf_set_extmark(bufnr, ns_id, mark.line - 1, 0, {
+      vim.api.nvim_buf_set_extmark(bufnr, M.ns_id, mark.line - 1, 0, {
         sign_text = sign_text,
-        sign_hl_group = config[mark.type].highlight_group,
-        priority = config[mark.type].priority,
+        sign_hl_group = M.config[mark.type].highlight_group,
+        priority = M.config[mark.type].priority,
       })
     end
   end
@@ -150,18 +159,18 @@ end
 ---Enable or disable guttermarks
 ---@param is_enabled boolean whether to enable or disable guttermarks
 function M.enable(is_enabled)
-  enabled = is_enabled
-  if enabled then
+  M.enabled = is_enabled
+  if M.enabled then
     M.refresh()
   else
     local bufnr = vim.api.nvim_get_current_buf()
-    vim.api.nvim_buf_clear_namespace(bufnr, ns_id, 0, -1)
+    vim.api.nvim_buf_clear_namespace(bufnr, M.ns_id, 0, -1)
   end
 end
 
 ---Enable guttermarks if disable, disable guttermarks if enabled
 function M.toggle()
-  M.enable(not enabled)
+  M.enable(not M.enabled)
 end
 
 return M

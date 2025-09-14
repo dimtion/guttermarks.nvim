@@ -1,6 +1,6 @@
 # GutterMarks.nvim
 
-A simple Neovim plugin that displays
+A Neovim plugin that displays
 [marks](https://neovim.io/doc/user/motion.html#_7.-marks) in the buffer gutter
 as signs. Keep track of your marks visually with customizable appearance and
 behavior.
@@ -18,9 +18,9 @@ behavior.
 ### Why this plugin
 
 I've been using [marks.nvim](https://github.com/chentoast/marks.nvim) and others
-to display marks in the gutter, but I don't need all the extra bells and whistle
-that those other plugins added. This is a fast, simple implementation that
-doesn't get in the way, and does not change nvim default behavior.
+to display marks in the gutter, but I don't need all the extra bells and
+whistles that those other plugins added. This is a fast, simple implementation
+that doesn't get in the way, and does not change nvim default behavior.
 
 ## Installation
 
@@ -39,16 +39,17 @@ doesn't get in the way, and does not change nvim default behavior.
 Plug 'dimtion/guttermarks.nvim'
 ```
 
-Then add to your `init.lua`:
-```lua
-require("guttermarks").setup()
-```
-
 ## Configuration
 
-See [full default configuration](lua/guttermarks/default_config.lua).
+Optionally use `setup(opts)` function to configure the plugin:
 
-Default configuration:
+```lua
+require("guttermarks").setup({
+  global_mark = { enabled = false },
+})
+```
+
+See [full default configuration](lua/guttermarks/config.lua):
 ```lua
 {
   local_mark = {
@@ -93,7 +94,7 @@ Default configuration:
 
 ## Customizing Highlights
 
-You can customize the default highlight groups in your colorscheme or `init.lua`:
+You can customize the default [highlight groups](https://neovim.io/doc/user/syntax.html) in your colorscheme or `init.lua`:
 
 ```lua
 vim.api.nvim_set_hl(0, "GutterMarksLocal", { fg = "#ffff00" })
@@ -101,7 +102,7 @@ vim.api.nvim_set_hl(0, "GutterMarksGlobal", { fg = "#ff0000", bold = true })
 vim.api.nvim_set_hl(0, "GutterMarksSpecial", { fg = "#00ff00", italic = true })
 ```
 
-## Cookbook
+## Advanced configuration
 
 ### Enable Special Marks
 
@@ -112,7 +113,6 @@ require("guttermarks").setup({
   special_mark = { enabled = true },
 })
 ```
-
 
 ### Using Custom Signs
 
@@ -157,7 +157,3 @@ require("guttermarks").setup({
 - Jump to marks with `'a` (local) or `'A` (global)
 - Use `` `a `` to jump to exact position (line and column) of mark 'a'
 - Delete mark 'a' with `:delmarks a`
-
-## License
-
-MIT
