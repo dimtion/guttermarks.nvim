@@ -59,6 +59,15 @@ function M.init()
     end,
   })
 
+  vim.api.nvim_create_autocmd('ModeChanged', {
+    group = group,
+    pattern = '[vV\x16]:*',
+    callback = function()
+      M.refresh()
+    end,
+    desc = "Refresh GutterMarks on visual ModeChange",
+  })
+
   M.excluded_filetypes = {}
   for _, ft in ipairs(M.config.excluded_filetypes) do
     M.excluded_filetypes[ft] = true
