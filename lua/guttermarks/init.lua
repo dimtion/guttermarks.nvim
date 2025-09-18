@@ -31,14 +31,14 @@ function M.init()
     M.setup()
   end
 
-  M.ns_id = vim.api.nvim_create_namespace("marks_gutter")
+  M.ns_id = vim.api.nvim_create_namespace("gutter_marks")
   M.is_enabled = true
 
   vim.api.nvim_set_hl(0, M.config.local_mark.highlight_group, { default = true })
   vim.api.nvim_set_hl(0, M.config.global_mark.highlight_group, { default = true })
   vim.api.nvim_set_hl(0, M.config.special_mark.highlight_group, { default = true })
 
-  local group = vim.api.nvim_create_augroup("MarksGutter", { clear = true })
+  local group = vim.api.nvim_create_augroup("GutterMarks", { clear = true })
 
   vim.api.nvim_create_autocmd(M.config.autocmd_triggers, {
     group = group,
@@ -57,6 +57,7 @@ function M.init()
         end
       end)
     end,
+    desc = "Refresh GutterMarks on CmdlineLeave",
   })
 
   vim.api.nvim_create_autocmd('ModeChanged', {
