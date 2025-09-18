@@ -60,9 +60,9 @@ function M.init()
     desc = "Refresh GutterMarks on CmdlineLeave",
   })
 
-  vim.api.nvim_create_autocmd('ModeChanged', {
+  vim.api.nvim_create_autocmd("ModeChanged", {
     group = group,
-    pattern = '[vV\x16]:*',
+    pattern = "[vV\x16]:*",
     callback = function()
       M.refresh()
     end,

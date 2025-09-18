@@ -10,4 +10,9 @@ ignore = {
   "122",
 }
 
-read_globals = { "vim" }
+read_globals = {
+    "vim",
+    "describe",
+    "it",
+    "assert",
+}
