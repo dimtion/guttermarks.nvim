@@ -1,5 +1,7 @@
 NVIM_EXEC ?= nvim
 
+default: check test
+
 .deps: .deps/mini.test
 
 .deps/mini.test:
@@ -20,7 +22,7 @@ check-lua:
 fmt:
 	stylua lua plugin test
 
-ci: check
+ci: check test
 
 
-.PHONY: fmt check check-fmt check-lua ci test
+.PHONY: default fmt check check-fmt check-lua ci test

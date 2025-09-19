@@ -151,6 +151,31 @@ require("guttermarks").setup({
 })
 ```
 
+## GutterMarks Actions
+
+To make marks more effective in vim, GutterMarks comes with a few actions that
+can be used in key mappings:
+
+```lua
+-- Delete the mark under the cursor
+vim.keymap.set("m;", require("guttermarks.actions").delete_mark)
+
+-- Send marks to quickfix (and open it)
+vim.keymap.set("<leader>mq", function()
+    require("guttermarks.actions").marks_to_quickfix()
+    vim.cmd("copen")
+end)
+
+-- Send marks to quickfix (include special marks)
+vim.keymap.set("<leader>mQ", function()
+    require("guttermarks.actions").marks_to_quickfix({
+        special_mark = true,
+    })
+    vim.cmd("copen")
+end)
+```
+
+
 ## Vim Marks cheat-sheet
 
 - Use `ma` to set local mark 'a', `mA` for global mark 'A'
