@@ -42,9 +42,8 @@ Using lazy.nvim:~
 >lua
     {
       "dimtion/guttermarks.nvim",
-      event = "VeryLazy",
+      event = { "BufReadPost", "BufNewFile", "BufWritePre" },
     }
-<
 
 
 ==============================================================================

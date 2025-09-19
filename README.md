@@ -29,7 +29,7 @@ that doesn't get in the way, and does not change nvim default behavior.
 ```lua
 {
   "dimtion/guttermarks.nvim",
-  event = "VeryLazy",
+  event = { "BufReadPost", "BufNewFile", "BufWritePre" },
 }
 ```
 

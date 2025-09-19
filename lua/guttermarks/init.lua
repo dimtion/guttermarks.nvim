@@ -32,7 +32,8 @@ function M.setup(opts)
   M.config = vim.tbl_deep_extend("force", require("guttermarks.config"), opts)
 end
 
----Configure initial hooks to use the plugin. Call this function once
+---Configure initial hooks to use the plugin.
+---Call this function once or when the configuration changes
 function M.init()
   if M.config == nil then
     M.setup()
