@@ -137,15 +137,16 @@ local function get_buffer_marks(bufnr)
 end
 
 ---Refresh marks in current buffer
+---@return boolean false if nothing done
 function M.refresh()
   if not M.is_enabled then
-    return
+    return false
   end
 
   local bufnr = vim.api.nvim_get_current_buf()
 
   if M.excluded_buftypes[vim.bo.bt] or M.excluded_filetypes[vim.bo.ft] then
-    return
+    return false
   end
 
   vim.api.nvim_buf_clear_namespace(bufnr, M.ns_id, 0, -1)
@@ -168,6 +169,8 @@ function M.refresh()
       priority = M.config[mark.type].priority,
     })
   end
+
+  return true
 end
 
 ---Enable or disable guttermarks

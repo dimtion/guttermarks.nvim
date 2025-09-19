@@ -1,5 +1,6 @@
+local MiniTest = require("mini.test")
 local T = MiniTest.new_set()
-local expect, eq = MiniTest.expect, MiniTest.expect.equality
+local eq = MiniTest.expect.equality
 
 local utils = require("guttermarks.utils")
 
@@ -29,7 +30,7 @@ T["alphabet_lower"]["is_upper"] = function(x)
   eq(utils.is_upper(x), false)
 end
 
-T["alphabet_lower"]["is_char"] = function(x)
+T["alphabet_lower"]["is_letter"] = function(x)
   eq(utils.is_letter(x), true)
 end
 
@@ -41,7 +42,7 @@ T["alphabet_upper"]["is_upper"] = function(x)
   eq(utils.is_upper(x), true)
 end
 
-T["alphabet_upper"]["is_char"] = function(x)
+T["alphabet_upper"]["is_letter"] = function(x)
   eq(utils.is_letter(x), true)
 end
 
@@ -51,6 +52,10 @@ end
 
 T["non_alphabet"]["is_upper"] = function(x)
   eq(utils.is_lower("}"), false)
+end
+
+T["non_alphabet"]["is_letter"] = function(x)
+  eq(utils.is_letter("a "), true)
 end
 
 return T
