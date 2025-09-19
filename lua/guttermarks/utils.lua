@@ -26,13 +26,12 @@ end
 ---@param config guttermarks.Config Configuration
 ---@return guttermarks.Mark[]
 function M.get_buffer_marks(bufnr, config)
-  local utils = require("guttermarks.utils")
   local marks = {}
 
   if config.local_mark.enabled then
     for _, mark in ipairs(vim.fn.getmarklist("%")) do
       local m = mark.mark:sub(2, 3)
-      if utils.is_letter(m) and utils.is_valid_mark(bufnr, mark.pos[2]) then
+      if M.is_letter(m) and M.is_valid_mark(bufnr, mark.pos[2]) then
         table.insert(marks, {
           mark = m,
           line = mark.pos[2],
@@ -45,7 +44,7 @@ function M.get_buffer_marks(bufnr, config)
   if config.global_mark.enabled then
     for _, mark in ipairs(vim.fn.getmarklist()) do
       local m = mark.mark:sub(2, 3)
-      if mark.pos[1] == bufnr and utils.is_letter(m) and utils.is_valid_mark(bufnr, mark.pos[2]) then
+      if mark.pos[1] == bufnr and M.is_letter(m) and M.is_valid_mark(bufnr, mark.pos[2]) then
         table.insert(marks, {
           mark = m,
           line = mark.pos[2],
@@ -58,7 +57,7 @@ function M.get_buffer_marks(bufnr, config)
   if config.special_mark.enabled then
     for _, mark in ipairs(config.special_mark.marks) do
       local pos = vim.api.nvim_buf_get_mark(bufnr, mark)
-      if utils.is_valid_mark(bufnr, pos[1]) then
+      if M.is_valid_mark(bufnr, pos[1]) then
         table.insert(marks, {
           mark = mark,
           line = pos[1],
