@@ -89,12 +89,13 @@ end
 
 ---Returns the list of enabled and valid marks in the selected buffer
 ---@param bufnr number Buffer number
+---@param config guttermarks.MarkConfig Configuration
 ---@return guttermarks.Mark[]
-local function get_buffer_marks(bufnr)
+local function get_buffer_marks(bufnr, config)
   local utils = require("guttermarks.utils")
   local marks = {}
 
-  if M.config.local_mark.enabled then
+  if config.local_mark.enabled then
     for _, mark in ipairs(vim.fn.getmarklist("%")) do
       local m = mark.mark:sub(2, 3)
       if utils.is_letter(m) and utils.is_valid_mark(bufnr, mark.pos[2]) then
@@ -107,7 +108,7 @@ local function get_buffer_marks(bufnr)
     end
   end
 
-  if M.config.global_mark.enabled then
+  if config.global_mark.enabled then
     for _, mark in ipairs(vim.fn.getmarklist()) do
       local m = mark.mark:sub(2, 3)
       if mark.pos[1] == bufnr and utils.is_letter(m) and utils.is_valid_mark(bufnr, mark.pos[2]) then
@@ -120,8 +121,8 @@ local function get_buffer_marks(bufnr)
     end
   end
 
-  if M.config.special_mark.enabled then
-    for _, mark in ipairs(M.config.special_mark.marks) do
+  if config.special_mark.enabled then
+    for _, mark in ipairs(config.special_mark.marks) do
       local pos = vim.api.nvim_buf_get_mark(bufnr, mark)
       if utils.is_valid_mark(bufnr, pos[1]) then
         table.insert(marks, {
@@ -151,7 +152,7 @@ function M.refresh()
 
   vim.api.nvim_buf_clear_namespace(bufnr, M.ns_id, 0, -1)
 
-  local marks = get_buffer_marks(bufnr)
+  local marks = get_buffer_marks(bufnr, M.config)
 
   for _, mark in ipairs(marks) do
     local sign_config = M.config[mark.type].sign
@@ -186,8 +187,10 @@ function M.enable(is_enabled)
 end
 
 ---Enable guttermarks if disable, disable guttermarks if enabled
+---@return boolean whether GutterMarks is enabled or disabled
 function M.toggle()
   M.enable(not M.is_enabled)
+  return M.is_enabled
 end
 
 return M

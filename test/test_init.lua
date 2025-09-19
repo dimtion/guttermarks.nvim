@@ -82,14 +82,43 @@ T["Complex flow"] = function()
   eq(gutter[2][4]["sign_text"], "b ")
 end
 
-T["GutterMarks disabled"] = function()
+T["enable()"] = function()
   new_buf()
   child.lua([[ M.enable(false) ]])
   child.type_keys("ggj0")
   child.type_keys({ "ma" })
 
-  local gutter = get_gutter()
-  eq(#gutter, 0)
+  eq(#get_gutter(), 0)
+
+  child.lua([[ M.enable(true) ]])
+  eq(#get_gutter(), 1)
+end
+
+T["toggle()"] = function()
+  new_buf()
+  child.lua([[ M.enable(false) ]])
+  child.type_keys("ggj0")
+  child.type_keys({ "ma" })
+
+  eq(child.lua_get([[ M.toggle() ]]), true)
+  eq(#get_gutter(), 1)
+
+  eq(child.lua_get([[ M.toggle() ]]), false)
+  eq(#get_gutter(), 0)
+end
+
+T["(force) refresh()"] = function()
+  new_buf()
+  child.type_keys("ggj0")
+  child.type_keys({ "ma" })
+
+  local bufnr = child.api.nvim_get_current_buf()
+  local ns = child.api.nvim_get_namespaces()["gutter_marks"]
+  child.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+  eq(#get_gutter(), 0)
+
+  eq(child.lua_get([[ M.refresh() ]]), true)
+  eq(#get_gutter(), 1)
 end
 
 return T
