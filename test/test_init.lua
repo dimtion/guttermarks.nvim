@@ -1,25 +1,14 @@
 -- Basic test to verify the extension loads correctly
 
 local MiniTest = require("mini.test")
+local helpers = dofile("test/helpers.lua")
 local eq = MiniTest.expect.equality
-local neq = MiniTest.expect.no_equality
 
 local child = MiniTest.new_child_neovim()
 
 local new_buf = function()
   child.bo.ft = "json"
   child.type_keys("iab<cr>cd<cr>ef<esc>gg")
-end
-
-local get_gutter = function()
-  local ns = child.api.nvim_get_namespaces()["gutter_marks"]
-  local bufnr = child.api.nvim_get_current_buf()
-  neq(ns, nil)
-  neq(bufnr, nil)
-  local gutter = child.api.nvim_buf_get_extmarks(bufnr, ns, 0, -1, {
-    details = true,
-  })
-  return gutter
 end
 
 local T = MiniTest.new_set({
@@ -49,7 +38,7 @@ T["Simple mark"] = function()
   child.type_keys("ggj0")
   child.type_keys("ma")
 
-  local gutter = get_gutter()
+  local gutter = helpers.get_gutter(child)
   eq(#gutter, 1)
   eq(gutter[1][4]["sign_text"], "a ")
 end
@@ -59,7 +48,7 @@ T["Delete mark"] = function()
   child.type_keys("ma")
   child.type_keys(":delmarks a<cr>")
 
-  eq(#get_gutter(), 0)
+  eq(#helpers.get_gutter(child), 0)
 end
 
 T["Multiple marks"] = function()
@@ -67,7 +56,7 @@ T["Multiple marks"] = function()
   child.type_keys("ggj0")
   child.type_keys({ "ma", "j", "mb" })
 
-  local gutter = get_gutter()
+  local gutter = helpers.get_gutter(child)
   eq(#gutter, 2)
   eq(gutter[1][4]["sign_text"], "a ")
   eq(gutter[2][4]["sign_text"], "b ")
@@ -78,7 +67,7 @@ T["Complex flow"] = function()
   child.type_keys("ggj0")
   child.type_keys({ "ma", "j", "mb", ":delmarks a<cr>", "k", "mC" })
 
-  local gutter = get_gutter()
+  local gutter = helpers.get_gutter(child)
   eq(#gutter, 2)
   eq(gutter[1][4]["sign_text"], "C ")
   eq(gutter[2][4]["sign_text"], "b ")
@@ -90,10 +79,10 @@ T["enable()"] = function()
   child.type_keys("ggj0")
   child.type_keys({ "ma" })
 
-  eq(#get_gutter(), 0)
+  eq(#helpers.get_gutter(child), 0)
 
   child.lua([[ M.enable(true) ]])
-  eq(#get_gutter(), 1)
+  eq(#helpers.get_gutter(child), 1)
 end
 
 T["toggle()"] = function()
@@ -103,10 +92,10 @@ T["toggle()"] = function()
   child.type_keys({ "ma" })
 
   eq(child.lua_get([[ M.toggle() ]]), true)
-  eq(#get_gutter(), 1)
+  eq(#helpers.get_gutter(child), 1)
 
   eq(child.lua_get([[ M.toggle() ]]), false)
-  eq(#get_gutter(), 0)
+  eq(#helpers.get_gutter(child), 0)
 end
 
 T["(force) refresh()"] = function()
@@ -117,10 +106,10 @@ T["(force) refresh()"] = function()
   local bufnr = child.api.nvim_get_current_buf()
   local ns = child.api.nvim_get_namespaces()["gutter_marks"]
   child.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
-  eq(#get_gutter(), 0)
+  eq(#helpers.get_gutter(child), 0)
 
   eq(child.lua_get([[ M.refresh() ]]), true)
-  eq(#get_gutter(), 1)
+  eq(#helpers.get_gutter(child), 1)
 end
 
 return T

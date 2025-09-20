@@ -1,23 +1,16 @@
 local MiniTest = require("mini.test")
 local T = MiniTest.new_set()
 local eq = MiniTest.expect.equality
+local helpers = dofile("test/helpers.lua")
 
 local utils = require("guttermarks.utils")
 
--- stylua: ignore
 T["alphabet_lower"] = MiniTest.new_set({
-  parametrize = {
-    { "a" }, { "b" }, { "c" }, { "d" }, { "e" }, { "f" }, { "g" }, { "h" }, { "i" }, { "j" }, { "k" }, { "l" }, { "m" },
-    { "n" }, { "o" }, { "p" }, { "q" }, { "r" }, { "s" }, { "t" }, { "u" }, { "v" }, { "w" }, { "x" }, { "y" }, { "z" },
-  },
+  parametrize = helpers.alphabet_lower,
 })
 
--- stylua: ignore
 T["alphabet_upper"] = MiniTest.new_set({
-  parametrize = {
-    { "A" }, { "B" }, { "C" }, { "D" }, { "E" }, { "F" }, { "G" }, { "H" }, { "I" }, { "J" }, { "K" }, { "L" }, { "M" },
-    { "N" }, { "O" }, { "P" }, { "Q" }, { "R" }, { "S" }, { "T" }, { "U" }, { "V" }, { "W" }, { "X" }, { "Y" }, { "Z" },
-  },
+  parametrize = helpers.alphabet_upper,
 })
 
 T["non_alphabet"] = MiniTest.new_set()
