@@ -37,7 +37,9 @@ T["Extension loads"] = function()
   local ok, guttermarks = pcall(require, "guttermarks")
   eq(ok, true)
   eq(type(guttermarks.setup), "function")
-  eq(type(guttermarks.init), "function")
+  eq(type(guttermarks.refresh), "function")
+  eq(type(guttermarks.enable), "function")
+  eq(type(guttermarks.toggle), "function")
 
   eq(child.lua_get([[ M.is_enabled ]]), true)
 end
