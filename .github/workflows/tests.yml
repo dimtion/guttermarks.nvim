@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: nebularg/actions-luacheck@v1
         with:
-          files: ["lua", "plugin", "test"]
+          files: "lua plugin test"
 
   test:
     name: Test on neovim ${{ matrix.neovim_version }}
