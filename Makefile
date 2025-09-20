@@ -24,5 +24,4 @@ fmt:
 
 ci: check test
 
-
 .PHONY: default fmt check check-fmt check-lua ci test

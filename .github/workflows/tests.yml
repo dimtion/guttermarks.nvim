@@ -11,13 +11,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Run tests neovim ${{ matrix.neovim_version }}
+  stylua:
+    name: Stylua
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
+          args: " --check lua plugin test"
+
+  luacheck:
+    name: Luacheck
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: nebularg/actions-luacheck@v1
+        with:
+          files: ["lua", "plugin", "test"]
+
+  test:
+    name: Test on neovim ${{ matrix.neovim_version }}
     timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: ["ubuntu-latest"]
         neovim_version: ["v0.9.5", "v0.10.4", "v0.11.4", "nightly"]
     runs-on: ${{ matrix.os }}
 
@@ -28,7 +48,5 @@ jobs:
         with:
           neovim: true
           version: ${{ matrix.neovim_version }}
-      - name: Check GutterMarks
-        run: make check
       - name: Test GutterMarks
         run: make test
