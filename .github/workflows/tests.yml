@@ -27,9 +27,9 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v4
-      - uses: nebularg/actions-luacheck@v1
+      - uses: lunarmodules/luacheck@v1
         with:
-          files: "lua plugin test"
+          args: "lua plugin test"
 
   test:
     name: Test on neovim ${{ matrix.neovim_version }}
