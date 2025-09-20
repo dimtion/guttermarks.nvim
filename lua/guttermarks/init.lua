@@ -24,20 +24,13 @@ M.is_enabled = false
 ---@type guttermarks.Config
 M.config = nil
 
----Setup the plugin configuration.
+---Configure initial hooks to use the plugin.
+---Call this function once or when the configuration changes
 ---Overrides the default configuration with the provided config passed as a parameter
 ---@param opts? guttermarks.Config
 function M.setup(opts)
   opts = opts or {}
   M.config = vim.tbl_deep_extend("force", require("guttermarks.config"), opts)
-end
-
----Configure initial hooks to use the plugin.
----Call this function once or when the configuration changes
-function M.init()
-  if M.config == nil then
-    M.setup()
-  end
 
   M._ns = vim.api.nvim_create_namespace("gutter_marks")
   M._au = vim.api.nvim_create_augroup("GutterMarks", { clear = true })
