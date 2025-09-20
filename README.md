@@ -2,13 +2,12 @@
 
 <div align="center">
 
-    [![Lua](https://img.shields.io/badge/Lua-blue.svg?style=for-the-badge&logo=lua)](http://www.lua.org)
-    [![Neovim](https://img.shields.io/badge/Neovim%200.9+-green.svg?style=for-the-badge&logo=neovim)](https://neovim.io)
-    [![MIT](https://img.shields.io/badge/MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-    <a href="https://dotfyle.com/plugins/dimtion/guttermarks.nvim">
-        <img src="https://dotfyle.com/plugins/dimtion/guttermarks.nvim/shield?style=for-the-badge" />
-    </a>
+[![Lua](https://img.shields.io/badge/Lua-blue.svg?style=for-the-badge&logo=lua)](http://www.lua.org)
+[![Neovim](https://img.shields.io/badge/Neovim%200.9+-green.svg?style=for-the-badge&logo=neovim)](https://neovim.io)
+[![MIT](https://img.shields.io/badge/MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![Dotfyle](https://dotfyle.com/plugins/dimtion/guttermarks.nvim/shield?style=for-the-badge)](https://dotfyle.com/plugins/dimtion/guttermarks.nvim)
 </div>
+
 
 A Neovim plugin that displays
 [marks](https://neovim.io/doc/user/motion.html#_7.-marks) in the buffer gutter
@@ -16,6 +15,8 @@ as signs. Keep track of your marks visually with customizable appearance and
 behavior.
 
 ![](.github/img/screenshot_01.png)
+
+
 
 ## Features
 
@@ -39,7 +40,12 @@ that doesn't get in the way, and does not change nvim default behavior.
 ```lua
 {
   "dimtion/guttermarks.nvim",
+
+
   event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+
+
+
 }
 ```
 
@@ -195,3 +201,20 @@ end)
 - Jump to marks with `'a` (local) or `'A` (global)
 - Use `` `a `` to jump to exact position (line and column) of mark 'a'
 - Delete mark 'a' with `:delmarks a`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
