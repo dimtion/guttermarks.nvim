@@ -8,16 +8,12 @@
 [![Dotfyle](https://dotfyle.com/plugins/dimtion/guttermarks.nvim/shield?style=for-the-badge)](https://dotfyle.com/plugins/dimtion/guttermarks.nvim)
 </div>
 
-
 A Neovim plugin that displays
 [marks](https://neovim.io/doc/user/motion.html#_7.-marks) in the buffer gutter
 as signs. Keep track of your marks visually with customizable appearance and
 behavior.
 
 ![](.github/img/screenshot_01.png)
-
-
-
 ## Features
 
 - Display local marks (a-z) in the gutter
@@ -40,12 +36,7 @@ that doesn't get in the way, and does not change nvim default behavior.
 ```lua
 {
   "dimtion/guttermarks.nvim",
-
-
   event = { "BufReadPost", "BufNewFile", "BufWritePre" },
-
-
-
 }
 ```
 
