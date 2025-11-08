@@ -43,12 +43,12 @@ T["non_alphabet"]["is_upper"] = function()
   eq(utils.is_upper("}"), false)
 end
 
-T["non_alphabet"]["is_upper"] = function()
+T["non_alphabet"]["is_lower"] = function()
   eq(utils.is_lower("}"), false)
 end
 
 T["non_alphabet"]["is_letter"] = function()
-  eq(utils.is_letter("a "), true)
+  eq(utils.is_letter("}"), false)
 end
 
 return T
