@@ -30,6 +30,7 @@ M.config = nil
 ---@param opts? guttermarks.Config
 function M.setup(opts)
   opts = opts or {}
+  require("guttermarks.validation").validate_config(opts)
   M.config = vim.tbl_deep_extend("force", require("guttermarks.config"), opts)
 
   M._ns = vim.api.nvim_create_namespace("gutter_marks")
