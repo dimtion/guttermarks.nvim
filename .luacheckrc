@@ -15,4 +15,5 @@ read_globals = {
     "describe",
     "it",
     "assert",
+    "MiniTest",
 }
