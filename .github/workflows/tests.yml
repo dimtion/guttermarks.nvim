@@ -50,3 +50,21 @@ jobs:
           version: ${{ matrix.neovim_version }}
       - name: Test GutterMarks
         run: make test
+
+  benchmark:
+    name: Benchmarks
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest"]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+      - name: Benchmark GutterMarks
+        run: make bench
