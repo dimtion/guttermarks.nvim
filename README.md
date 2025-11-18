@@ -164,26 +164,22 @@ To make marks more effective in vim, GutterMarks comes with a few actions that
 can be used by creating key mappings:
 
 ```lua
--- Delete the mark under the cursor
-vim.keymap.set("m;", require("guttermarks.actions").delete_mark)
+vim.keymap.set("n", "m;", require("guttermarks.actions").delete_mark, { desc = "Delete mark under cursor" })
 
--- Navigate to next/previous mark in current buffer
-vim.keymap.set("]m", require("guttermarks.actions").next_buf_mark)
-vim.keymap.set("[m", require("guttermarks.actions").prev_buf_mark)
+vim.keymap.set("n", "]m", require("guttermarks.actions").next_buf_mark, { desc = "Next mark in current buffer" })
+vim.keymap.set("n", "[m", require("guttermarks.actions").prev_buf_mark, { desc = "Previous mark in current buffer" })
 
--- Send marks to quickfix (and open it)
-vim.keymap.set("<leader>mq", function()
+vim.keymap.set("n", "<leader>mq", function()
     require("guttermarks.actions").marks_to_quickfix()
     vim.cmd("copen")
-end)
+end, { desc = "Send marks to quickfix (and open it)" })
 
--- Send marks to quickfix (include special marks)
-vim.keymap.set("<leader>mQ", function()
+vim.keymap.set("n", "<leader>mQ", function()
     require("guttermarks.actions").marks_to_quickfix({
         special_mark = true,
     })
     vim.cmd("copen")
-end)
+end, { desc = "Send marks to quickfix (include special marks)" })
 ```
 
 ## Vim Marks cheat-sheet
