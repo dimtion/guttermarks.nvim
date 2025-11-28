@@ -108,6 +108,7 @@ T["(force) refresh()"] = function()
   child.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
   eq(#helpers.get_gutter(child), 0)
 
+  child.lua([[M._marks_cache[vim.api.nvim_get_current_buf()] = nil]])
   eq(child.lua_get([[ M.refresh() ]]), true)
   eq(#helpers.get_gutter(child), 1)
 end

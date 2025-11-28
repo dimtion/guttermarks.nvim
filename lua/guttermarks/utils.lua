@@ -70,4 +70,23 @@ function M.get_buffer_marks(bufnr, config)
   return marks
 end
 
+---Compare two mark lists for equality
+---@param marks1 guttermarks.Mark[]
+---@param marks2 guttermarks.Mark[]
+---@return boolean
+function M.marks_equal(marks1, marks2)
+  if #marks1 ~= #marks2 then
+    return false
+  end
+
+  for i = 1, #marks1 do
+    local m1, m2 = marks1[i], marks2[i]
+    if m1.mark ~= m2.mark or m1.line ~= m2.line or m1.type ~= m2.type then
+      return false
+    end
+  end
+
+  return true
+end
+
 return M

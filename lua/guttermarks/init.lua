@@ -24,6 +24,10 @@ M.is_enabled = false
 ---@type guttermarks.Config
 M.config = nil
 
+---Cache of marks per buffer
+---@type table<number, guttermarks.Mark[]>
+M._marks_cache = {}
+
 ---Configure initial hooks to use the plugin.
 ---Call this function once or when the configuration changes
 ---Overrides the default configuration with the provided config passed as a parameter
@@ -90,6 +94,14 @@ function M.setup(opts)
   for _, ft in ipairs(M.config.excluded_buftypes) do
     M.excluded_buftypes[ft] = true
   end
+
+  vim.api.nvim_create_autocmd("BufDelete", {
+    group = M._au,
+    callback = function(ev)
+      M._marks_cache[ev.buf] = nil
+    end,
+    desc = "Clear GutterMarks cache on buffer delete",
+  })
 end
 
 ---Refresh marks in current buffer
@@ -104,9 +116,15 @@ function M.refresh()
   end
 
   local bufnr = vim.api.nvim_get_current_buf()
-  vim.api.nvim_buf_clear_namespace(bufnr, M._ns, 0, -1)
+  local utils = require("guttermarks.utils")
+  local marks = utils.get_buffer_marks(bufnr, M.config)
 
-  local marks = require("guttermarks.utils").get_buffer_marks(bufnr, M.config)
+  local cached_marks = M._marks_cache[bufnr]
+  if cached_marks and utils.marks_equal(marks, cached_marks) then
+    return true
+  end
+
+  vim.api.nvim_buf_clear_namespace(bufnr, M._ns, 0, -1)
 
   for _, mark in ipairs(marks) do
     local sign_config = M.config[mark.type].sign
@@ -125,6 +143,8 @@ function M.refresh()
     })
   end
 
+  M._marks_cache[bufnr] = marks
+
   return true
 end
 
@@ -137,6 +157,7 @@ function M.enable(is_enabled)
   else
     local bufnr = vim.api.nvim_get_current_buf()
     vim.api.nvim_buf_clear_namespace(bufnr, M._ns, 0, -1)
+    M._marks_cache[bufnr] = nil
   end
 end
 
