@@ -21,13 +21,16 @@ behavior.
 - Optional display of special marks (numbers, symbols)
 - Configurable sign text and highlight groups
 - Automatic refresh on text changes
+- Utility actions for enhanced marks workflow
 
 ### Why this plugin
 
 I've been using [marks.nvim](https://github.com/chentoast/marks.nvim) and others
 to display marks in the gutter, but I don't need all the extra bells and
 whistles that those other plugins added. This is a fast, simple implementation
-that doesn't get in the way, and does not change nvim default behavior.
+that doesn't get in the way, and does not change nvim default behavior. Further,
+I worked a bit to benchmark and make sure this plugin is fast and the
+implementation does not impact vim performances.
 
 ## Installation
 
@@ -36,7 +39,7 @@ that doesn't get in the way, and does not change nvim default behavior.
 ```lua
 {
   "dimtion/guttermarks.nvim",
-  event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+  event = { "BufReadPost", "BufNewFile", "BufWritePre", "FileType" },
 }
 ```
 
@@ -111,7 +114,7 @@ vim.api.nvim_set_hl(0, "GutterMarksSpecial", { fg = "#00ff00", italic = true })
 
 ## Advanced configuration
 
-### Enable Special Marks
+### Enable Special Marks (disabled by default)
 
 ![](.github/img/screenshot_02.png)
 
@@ -136,7 +139,7 @@ require("guttermarks").setup({
 })
 ```
 
-### Minimal Setup for Local Marks Only
+### Local Marks Only
 
 ```lua
 require("guttermarks").setup({
@@ -188,20 +191,4 @@ end, { desc = "Send marks to quickfix (include special marks)" })
 - Jump to marks with `'a` (local) or `'A` (global)
 - Use `` `a `` to jump to exact position (line and column) of mark 'a'
 - Delete mark 'a' with `:delmarks a`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
