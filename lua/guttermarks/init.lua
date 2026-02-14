@@ -155,9 +155,12 @@ function M.enable(is_enabled)
   if M.is_enabled then
     M.refresh()
   else
-    local bufnr = vim.api.nvim_get_current_buf()
-    vim.api.nvim_buf_clear_namespace(bufnr, M._ns, 0, -1)
-    M._marks_cache[bufnr] = nil
+    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+      if vim.api.nvim_buf_is_loaded(bufnr) then
+        vim.api.nvim_buf_clear_namespace(bufnr, M._ns, 0, -1)
+        M._marks_cache[bufnr] = nil
+      end
+    end
   end
 end
 

@@ -85,6 +85,30 @@ T["enable()"] = function()
   eq(#helpers.get_gutter(child), 1)
 end
 
+T["enable(false) clears signs in all loaded buffers"] = function()
+  -- Set up buf1 with a mark and verify the sign appears
+  new_buf()
+  child.type_keys("ggj0")
+  child.type_keys("ma")
+  local buf1 = child.api.nvim_get_current_buf()
+  local ns = child.api.nvim_get_namespaces()["gutter_marks"]
+  local signs_buf1 = child.api.nvim_buf_get_extmarks(buf1, ns, 0, -1, { details = true })
+  eq(#signs_buf1, 1)
+
+  -- Switch to a new buffer and set a mark there (buf1 is no longer current)
+  child.lua([[vim.cmd('enew')]])
+  child.bo.ft = "json"
+  child.type_keys("iab<cr>cd<cr>ef<esc>gg")
+  child.type_keys("ggj0mb")
+
+  -- Disable from the new buffer; buf1 is a non-current loaded buffer
+  child.lua([[M.enable(false)]])
+
+  -- Signs in buf1 must be cleared even though it was not the current buffer
+  signs_buf1 = child.api.nvim_buf_get_extmarks(buf1, ns, 0, -1, { details = true })
+  eq(#signs_buf1, 0)
+end
+
 T["toggle()"] = function()
   new_buf()
   child.lua([[ M.enable(false) ]])
