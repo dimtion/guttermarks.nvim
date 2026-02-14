@@ -38,6 +38,15 @@ function M.setup(opts)
   M.config = vim.tbl_deep_extend("force", require("guttermarks.config"), opts)
 
   M._ns = vim.api.nvim_create_namespace("gutter_marks")
+
+  -- Clear signs and cache
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(bufnr) then
+      vim.api.nvim_buf_clear_namespace(bufnr, M._ns, 0, -1)
+    end
+  end
+  M._marks_cache = {}
+
   M._au = vim.api.nvim_create_augroup("GutterMarks", { clear = true })
   M.is_enabled = true
 
