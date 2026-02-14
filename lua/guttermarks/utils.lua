@@ -29,7 +29,7 @@ function M.get_buffer_marks(bufnr, config)
   local marks = {}
 
   if config.local_mark.enabled then
-    for _, mark in ipairs(vim.fn.getmarklist("%")) do
+    for _, mark in ipairs(vim.fn.getmarklist(bufnr)) do
       local m = mark.mark:sub(2, 3)
       if M.is_letter(m) and M.is_valid_mark(bufnr, mark.pos[2]) then
         table.insert(marks, {

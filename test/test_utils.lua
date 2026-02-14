@@ -5,6 +5,8 @@ local helpers = dofile("test/helpers.lua")
 
 local utils = require("guttermarks.utils")
 
+local child = MiniTest.new_child_neovim()
+
 T["alphabet_lower"] = MiniTest.new_set({
   parametrize = helpers.alphabet_lower,
 })
@@ -109,6 +111,33 @@ T["marks_equal"]["order matters"] = function()
     { mark = "a", line = 1, type = "local_mark" },
   }
   eq(utils.marks_equal(marks1, marks2), false)
+end
+
+T["get_buffer_marks"] = MiniTest.new_set({
+  hooks = {
+    pre_case = function()
+      child.restart({ "-u", "test/init.lua" })
+    end,
+    post_once = child.stop,
+  },
+})
+
+T["get_buffer_marks"]["returns marks for non-current buffer"] = function()
+  child.type_keys("iline1<cr>line2<cr>line3<esc>gg")
+  child.type_keys("jma") -- set mark 'a' on line 2
+  local bufnr_a = child.api.nvim_get_current_buf()
+
+  child.lua("vim.cmd('enew')")
+  child.type_keys("iother<esc>")
+
+  local marks = child.lua_get(
+    string.format([[require("guttermarks.utils").get_buffer_marks(%d, require("guttermarks.config"))]], bufnr_a)
+  )
+
+  eq(#marks, 1)
+  eq(marks[1].mark, "a")
+  eq(marks[1].line, 2)
+  eq(marks[1].type, "local_mark")
 end
 
 return T
