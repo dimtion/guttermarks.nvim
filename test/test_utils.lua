@@ -51,4 +51,64 @@ T["non_alphabet"]["is_letter"] = function()
   eq(utils.is_letter("}"), false)
 end
 
+T["marks_equal"] = MiniTest.new_set()
+
+T["marks_equal"]["equal empty lists"] = function()
+  eq(utils.marks_equal({}, {}), true)
+end
+
+T["marks_equal"]["equal single mark"] = function()
+  local mark = { mark = "a", line = 1, type = "local_mark" }
+  eq(utils.marks_equal({ mark }, { mark }), true)
+end
+
+T["marks_equal"]["different lengths"] = function()
+  local m1 = { mark = "a", line = 1, type = "local_mark" }
+  local m2 = { mark = "b", line = 2, type = "local_mark" }
+  eq(utils.marks_equal({ m1 }, { m1, m2 }), false)
+  eq(utils.marks_equal({ m1, m2 }, { m1 }), false)
+end
+
+T["marks_equal"]["different mark name"] = function()
+  local m1 = { mark = "a", line = 1, type = "local_mark" }
+  local m2 = { mark = "b", line = 1, type = "local_mark" }
+  eq(utils.marks_equal({ m1 }, { m2 }), false)
+end
+
+T["marks_equal"]["different line"] = function()
+  local m1 = { mark = "a", line = 1, type = "local_mark" }
+  local m2 = { mark = "a", line = 2, type = "local_mark" }
+  eq(utils.marks_equal({ m1 }, { m2 }), false)
+end
+
+T["marks_equal"]["different type"] = function()
+  local m1 = { mark = "a", line = 1, type = "local_mark" }
+  local m2 = { mark = "a", line = 1, type = "global_mark" }
+  eq(utils.marks_equal({ m1 }, { m2 }), false)
+end
+
+T["marks_equal"]["multiple equal marks"] = function()
+  local marks1 = {
+    { mark = "a", line = 1, type = "local_mark" },
+    { mark = "B", line = 5, type = "global_mark" },
+  }
+  local marks2 = {
+    { mark = "a", line = 1, type = "local_mark" },
+    { mark = "B", line = 5, type = "global_mark" },
+  }
+  eq(utils.marks_equal(marks1, marks2), true)
+end
+
+T["marks_equal"]["order matters"] = function()
+  local marks1 = {
+    { mark = "a", line = 1, type = "local_mark" },
+    { mark = "b", line = 2, type = "local_mark" },
+  }
+  local marks2 = {
+    { mark = "b", line = 2, type = "local_mark" },
+    { mark = "a", line = 1, type = "local_mark" },
+  }
+  eq(utils.marks_equal(marks1, marks2), false)
+end
+
 return T
