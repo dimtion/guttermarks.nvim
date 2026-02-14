@@ -23,7 +23,7 @@ M.delete_mark = function(bufnr, line)
 end
 
 ---Action to send marks to quickfix list
----@param opts table|nil - options table with local_marks, global_marks, special_marks booleans
+---@param opts table|nil - options table with local_mark, global_mark, special_mark booleans
 M.marks_to_quickfix = function(opts)
   opts = opts or {}
   local local_mark = opts.local_mark ~= false
@@ -88,11 +88,12 @@ M.marks_to_quickfix = function(opts)
 end
 
 ---@param direction "forward"|"backward" - search forward or backward
----@param opts table|nil - options table with local_marks, global_marks booleans
+---@param opts table|nil - options table with local_mark, global_mark, wrap booleans
 local function navigate_buf_mark(direction, opts)
   opts = opts or {}
   local local_mark = opts.local_mark ~= false
   local global_mark = opts.global_mark ~= false
+  local wrap = opts.wrap == true
 
   local bufnr = vim.api.nvim_get_current_buf()
   local current_line = vim.api.nvim_win_get_cursor(0)[1]
@@ -136,19 +137,52 @@ local function navigate_buf_mark(direction, opts)
     end
   end
 
+  -- Wrap around: find the first/last mark in the buffer when no mark in direction
+  if not target_mark and wrap then
+    local wrap_select_fn = direction == "forward"
+        and function(new_mark, current_best)
+          return not current_best or new_mark.line < current_best.line
+        end
+      or function(new_mark, current_best)
+        return not current_best or new_mark.line > current_best.line
+      end
+
+    if local_mark then
+      for _, m in ipairs(vim.fn.getmarklist(bufnr)) do
+        if m.mark:match("^'[a-z]") then
+          local mark_data = { line = m.pos[2], col = m.pos[3], mark = m.mark:sub(2) }
+          if wrap_select_fn(mark_data, target_mark) then
+            target_mark = mark_data
+          end
+        end
+      end
+    end
+
+    if global_mark then
+      for _, m in ipairs(vim.fn.getmarklist()) do
+        if m.pos[1] == bufnr and m.mark:match("^'[A-Z]") then
+          local mark_data = { line = m.pos[2], col = m.pos[3], mark = m.mark:sub(2) }
+          if wrap_select_fn(mark_data, target_mark) then
+            target_mark = mark_data
+          end
+        end
+      end
+    end
+  end
+
   if target_mark then
     vim.api.nvim_win_set_cursor(0, { target_mark.line, target_mark.col })
   end
 end
 
 ---Navigate to the next mark in buffer (forward)
----@param opts table|nil - options table with local_marks, global_marks booleans
+---@param opts table|nil - options table with local_mark, global_mark, wrap booleans
 M.next_buf_mark = function(opts)
   navigate_buf_mark("forward", opts)
 end
 
 ---Navigate to the previous mark in buffer (backward)
----@param opts table|nil - options table with local_marks, global_marks booleans
+---@param opts table|nil - options table with local_mark, global_mark, wrap booleans
 M.prev_buf_mark = function(opts)
   navigate_buf_mark("backward", opts)
 end
