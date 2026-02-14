@@ -67,7 +67,7 @@ function M.setup(opts)
       callback = function()
         vim.schedule(function()
           local cmdline = vim.fn.histget("cmd", -1)
-          if cmdline:match("^m[a-zA-Z0-9]") or cmdline:match("^delm") then
+          if cmdline:match("^ma") or cmdline:match("^delm") then
             M.refresh()
           end
         end)

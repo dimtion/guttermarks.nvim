@@ -122,6 +122,18 @@ T["toggle()"] = function()
   eq(#helpers.get_gutter(child), 0)
 end
 
+T["Mark set via :mark command triggers sign"] = function()
+  new_buf()
+  child.type_keys("ggj0")
+  -- Set mark via ex command (not the 'm' keymap override), so only
+  -- the CmdlineLeave autocmd can trigger the sign refresh.
+  child.type_keys(":mark a<cr>")
+
+  local gutter = helpers.get_gutter(child)
+  eq(#gutter, 1)
+  eq(gutter[1][4]["sign_text"], "a ")
+end
+
 T["(force) refresh()"] = function()
   new_buf()
   child.type_keys("ggj0")
