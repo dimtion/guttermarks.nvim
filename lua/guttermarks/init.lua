@@ -28,6 +28,16 @@ M.config = nil
 ---@type table<number, guttermarks.Mark[]>
 M._marks_cache = {}
 
+---Register the 'm' normal-mode keymap override so mark setting triggers a gutter refresh
+function M._register_m_keymap()
+  vim.keymap.set("n", "m", function()
+    local char = vim.fn.getchar()
+    local key = vim.fn.nr2char(char)
+    vim.api.nvim_feedkeys("m" .. key, "n", true)
+    vim.schedule(M.refresh)
+  end, { desc = "Set mark (with gutter update)" })
+end
+
 ---Configure initial hooks to use the plugin.
 ---Call this function once or when the configuration changes
 ---Overrides the default configuration with the provided config passed as a parameter
@@ -75,12 +85,7 @@ function M.setup(opts)
       desc = "Refresh GutterMarks on CmdlineLeave",
     })
 
-    vim.keymap.set("n", "m", function()
-      local char = vim.fn.getchar()
-      local key = vim.fn.nr2char(char)
-      vim.api.nvim_feedkeys("m" .. key, "n", true)
-      vim.schedule(M.refresh)
-    end, { desc = "Set mark (with gutter update)" })
+    M._register_m_keymap()
   end
 
   if M.config.special_mark.enabled then
@@ -162,6 +167,9 @@ end
 function M.enable(is_enabled)
   M.is_enabled = is_enabled
   if M.is_enabled then
+    if M.config.local_mark.enabled or M.config.global_mark.enabled then
+      M._register_m_keymap()
+    end
     M.refresh()
   else
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
@@ -170,6 +178,7 @@ function M.enable(is_enabled)
         M._marks_cache[bufnr] = nil
       end
     end
+    pcall(vim.keymap.del, "n", "m")
   end
 end
 

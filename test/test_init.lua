@@ -149,4 +149,18 @@ T["(force) refresh()"] = function()
   eq(#helpers.get_gutter(child), 1)
 end
 
+T["m keymap removed on disable and restored on enable"] = function()
+  new_buf()
+  -- Keymap must be registered after setup
+  eq(child.lua_get([[vim.fn.mapcheck("m", "n") ~= ""]]), true)
+
+  child.lua("M.enable(false)")
+  -- Keymap must be removed so users can define their own
+  eq(child.lua_get([[vim.fn.mapcheck("m", "n")]]), "")
+
+  child.lua("M.enable(true)")
+  -- Keymap must be re-registered when re-enabled
+  eq(child.lua_get([[vim.fn.mapcheck("m", "n") ~= ""]]), true)
+end
+
 return T
