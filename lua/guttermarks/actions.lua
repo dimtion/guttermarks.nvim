@@ -93,80 +93,60 @@ local function navigate_buf_mark(direction, opts)
   opts = opts or {}
   local local_mark = opts.local_mark ~= false
   local global_mark = opts.global_mark ~= false
-  local wrap = opts.wrap == true
+  local wrap = opts.wrap ~= false
 
   local bufnr = vim.api.nvim_get_current_buf()
-  local current_line = vim.api.nvim_win_get_cursor(0)[1]
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local current_line = cursor[1]
+  local current_col = cursor[2]
 
-  local target_mark = nil
-  local compare_fn = direction == "forward" and function(mark_line)
-    return mark_line > current_line
-  end or function(mark_line)
-    return mark_line < current_line
-  end
+  -- Collect all relevant marks into one list
+  local all_marks = {}
 
-  local select_fn = direction == "forward"
-      and function(new_mark, current_best)
-        return not current_best or new_mark.line < current_best.line
-      end
-    or function(new_mark, current_best)
-      return not current_best or new_mark.line > current_best.line
-    end
-
-  -- Check local marks
   if local_mark then
     for _, m in ipairs(vim.fn.getmarklist(bufnr)) do
-      if m.mark:match("^'[a-z]") and compare_fn(m.pos[2]) then
-        local mark_data = { line = m.pos[2], col = m.pos[3], mark = m.mark:sub(2) }
-        if select_fn(mark_data, target_mark) then
-          target_mark = mark_data
-        end
+      if m.mark:match("^'[a-z]") then
+        table.insert(all_marks, { line = m.pos[2], col = m.pos[3] - 1, mark = m.mark:sub(2) })
       end
     end
   end
 
-  -- Check global marks
   if global_mark then
     for _, m in ipairs(vim.fn.getmarklist()) do
-      if m.pos[1] == bufnr and m.mark:match("^'[A-Z]") and compare_fn(m.pos[2]) then
-        local mark_data = { line = m.pos[2], col = m.pos[3], mark = m.mark:sub(2) }
-        if select_fn(mark_data, target_mark) then
-          target_mark = mark_data
-        end
+      if m.pos[1] == bufnr and m.mark:match("^'[A-Z]") then
+        table.insert(all_marks, { line = m.pos[2], col = m.pos[3] - 1, mark = m.mark:sub(2) })
       end
     end
   end
 
-  -- Wrap around: find the first/last mark in the buffer when no mark in direction
-  if not target_mark and wrap then
-    local wrap_select_fn = direction == "forward"
-        and function(new_mark, current_best)
-          return not current_best or new_mark.line < current_best.line
-        end
-      or function(new_mark, current_best)
-        return not current_best or new_mark.line > current_best.line
-      end
+  table.sort(all_marks, function(a, b)
+    if a.line ~= b.line then
+      return a.line < b.line
+    end
+    return a.col < b.col
+  end)
 
-    if local_mark then
-      for _, m in ipairs(vim.fn.getmarklist(bufnr)) do
-        if m.mark:match("^'[a-z]") then
-          local mark_data = { line = m.pos[2], col = m.pos[3], mark = m.mark:sub(2) }
-          if wrap_select_fn(mark_data, target_mark) then
-            target_mark = mark_data
-          end
-        end
+  -- Scan sorted list for the nearest mark in the requested direction
+  local target_mark = nil
+  if direction == "forward" then
+    for _, m in ipairs(all_marks) do
+      if m.line > current_line or (m.line == current_line and m.col > current_col) then
+        target_mark = m
+        break
       end
     end
-
-    if global_mark then
-      for _, m in ipairs(vim.fn.getmarklist()) do
-        if m.pos[1] == bufnr and m.mark:match("^'[A-Z]") then
-          local mark_data = { line = m.pos[2], col = m.pos[3], mark = m.mark:sub(2) }
-          if wrap_select_fn(mark_data, target_mark) then
-            target_mark = mark_data
-          end
-        end
+    if not target_mark and wrap then
+      target_mark = all_marks[1]
+    end
+  else
+    for i = #all_marks, 1, -1 do
+      if all_marks[i].line < current_line or (all_marks[i].line == current_line and all_marks[i].col < current_col) then
+        target_mark = all_marks[i]
+        break
       end
+    end
+    if not target_mark and wrap then
+      target_mark = all_marks[#all_marks]
     end
   end
 
