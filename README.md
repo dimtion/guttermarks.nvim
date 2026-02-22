@@ -24,13 +24,14 @@ behavior.
 - Utility actions for enhanced marks workflow
 
 ### Why this plugin
+[Read the launch blog post](https://dimtion.fr/blog/2025/guttermarks-nvim/)
 
 I've been using [marks.nvim](https://github.com/chentoast/marks.nvim) and others
 to display marks in the gutter, but I don't need all the extra bells and
 whistles that those other plugins added. This is a fast, simple implementation
 that doesn't get in the way, and does not change nvim default behavior. Further,
 I worked a bit to benchmark and make sure this plugin is fast and the
-implementation does not impact vim performances.
+implementation does not impact Neovim performances.
 
 ## Installation
 
@@ -175,7 +176,7 @@ vim.keymap.set("n", "[m", require("guttermarks.actions").prev_buf_mark, { desc =
 vim.keymap.set("n", "<leader>mq", function()
     require("guttermarks.actions").marks_to_quickfix()
     vim.cmd("copen")
-end, { desc = "Send marks to quickfix (and open it)" })
+end, { desc = "Send marks to quickfix" })
 
 vim.keymap.set("n", "<leader>mQ", function()
     require("guttermarks.actions").marks_to_quickfix({
