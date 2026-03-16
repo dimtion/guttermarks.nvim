@@ -151,6 +151,7 @@ local function navigate_buf_mark(direction, opts)
   end
 
   if target_mark then
+    vim.cmd("normal! m'") -- push current position to jumplist
     vim.api.nvim_win_set_cursor(0, { target_mark.line, target_mark.col })
   end
 end

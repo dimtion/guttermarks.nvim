@@ -193,4 +193,32 @@ T["prev_buf_mark wrap"]["no wrap without opt"] = function()
   eq(child.api.nvim_win_get_cursor(0)[1], 1)
 end
 
+T["Jumplist"] = MiniTest.new_set()
+
+T["Jumplist"]["next_buf_mark pushes previous position"] = function()
+  new_buf()
+  child.type_keys({ "jj", "0", "ma", "kk", "0" })
+  child.lua([[ vim.cmd("clearjumps") ]])
+
+  child.lua([[ M.next_buf_mark() ]])
+  eq(child.api.nvim_win_get_cursor(0), { 3, 0 })
+
+  local jl = child.lua_get([[ vim.fn.getjumplist() ]])[1]
+  eq(#jl, 1)
+  eq(jl[1].lnum, 1)
+end
+
+T["Jumplist"]["prev_buf_mark pushes previous position"] = function()
+  new_buf()
+  child.type_keys({ "gg", "0", "ma", "jjjj", "0" })
+  child.lua([[ vim.cmd("clearjumps") ]])
+
+  child.lua([[ M.prev_buf_mark() ]])
+  eq(child.api.nvim_win_get_cursor(0)[1], 1)
+
+  local jl = child.lua_get([[ vim.fn.getjumplist() ]])[1]
+  eq(#jl, 1)
+  eq(jl[1].lnum, 5)
+end
+
 return T
