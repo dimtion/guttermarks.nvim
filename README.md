@@ -82,8 +82,8 @@ See [full default configuration](lua/guttermarks/config.lua):
     highlight_group = "GutterMarksSpecial",
     priority = 10,
   },
-  excluded_filetypes = { "" },
-  excluded_buftypes = {},
+  excluded_filetypes = { "NvimTree", "" },
+  excluded_buftypes = { "terminal", "prompt", "quickfix" },
   -- Advanced: Customize Autocmd events that trigger a refresh
   autocmd_triggers = {
     "BufEnter",

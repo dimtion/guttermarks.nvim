@@ -33,7 +33,7 @@ Features:~
 ==============================================================================
 2. REQUIREMENTS					*guttermarks-requirements*
 
-• Neovim 0.7+ (uses extmarks API)
+• Neovim 0.9+ (uses extmarks API)
 
 ==============================================================================
 3. INSTALLATION					*guttermarks-installation*
@@ -42,7 +42,7 @@ Using lazy.nvim:~
 >lua
     {
       "dimtion/guttermarks.nvim",
-      event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+      event = { "BufReadPost", "BufNewFile", "BufWritePre", "FileType" },
     }
 
 
@@ -62,7 +62,7 @@ local_mark~
 
     Fields:~
     • enabled (boolean): Enable local marks display (default: true)
-    • sign (string|nil): Custom sign text (default: nil, uses mark letter)
+    • sign (string|function|nil): Custom sign text (default: nil, uses mark letter)
     • highlight_group (string): Highlight group name (default: "GutterMarksLocal")
     • priority (number): Sign priority (default: 10)
 
@@ -72,7 +72,7 @@ global_mark~
 
     Fields:~
     • enabled (boolean): Enable global marks display (default: true)
-    • sign (string|nil): Custom sign text (default: nil, uses mark letter)
+    • sign (string|function|nil): Custom sign text (default: nil, uses mark letter)
     • highlight_group (string): Highlight group name (default:
       "GutterMarksGlobal")
     • priority (number): Sign priority (default: 11)
@@ -83,11 +83,11 @@ special_mark~
 
     Fields:~
     • enabled (boolean): Enable special marks display (default: false)
-    • sign (string|nil): Custom sign text (default: nil, uses mark character)
+    • sign (string|function|nil): Custom sign text (default: nil, uses mark character)
     • marks (table): List of special marks to display
-      (default: { "'", "^", ".", "[", "]", "<", ">", '"', "`", "\"", "0"-"9" })
+      (default: { "'", "^", ".", "[", "]", "<", ">", '"', "`", "0"-"9" })
     • highlight_group (string): Highlight group name (default:
-      "GutterMarksGlobal")
+      "GutterMarksSpecial")
     • priority (number): Sign priority (default: 10)
 
 						*guttermarks-autocmd_triggers*
@@ -98,12 +98,12 @@ autocmd_triggers~
 						*guttermarks-excluded_filetypes*
 excluded_filetypes~
     List of filetypes where guttermarks should be disabled.
-    Default: { "" }
+    Default: { "NvimTree", "" }
 
-						*guttermarks-disabled_filetype*
-disabled_filetype~
-    Alias for excluded_filetypes (deprecated, use excluded_filetypes instead).
-    Default: { "" }
+						*guttermarks-excluded_buftypes*
+excluded_buftypes~
+    List of buffer types where guttermarks should be disabled.
+    Default: { "terminal", "prompt", "quickfix" }
 
 ==============================================================================
 5. COMMANDS					*guttermarks-commands*
@@ -223,7 +223,7 @@ Manual refresh after setting marks programmatically:~
     require("guttermarks").refresh()
 <
 
-See lua/guttermarks/default_config.lua for all configuration options.
+See lua/guttermarks/config.lua for all configuration options.
 
 ==============================================================================
 9. CHANGELOG					*guttermarks-changelog*
