@@ -31,7 +31,7 @@ function M.get_buffer_marks(bufnr, config)
   if config.local_mark.enabled then
     for _, mark in ipairs(vim.fn.getmarklist(bufnr)) do
       local m = mark.mark:sub(2, 3)
-      if M.is_letter(m) and M.is_valid_mark(bufnr, mark.pos[2]) then
+      if M.is_lower(m) and M.is_valid_mark(bufnr, mark.pos[2]) then
         table.insert(marks, {
           mark = m,
           line = mark.pos[2],
