@@ -35,6 +35,14 @@ implementation does not impact Neovim performances.
 
 ## Installation
 
+### Using [vim.pack](https://neovim.io/doc/user/pack/#vim.pack) (Neovim 0.12+)
+
+```lua
+vim.pack.add({
+  'https://github.com/dimtion/guttermarks.nvim',
+})
+```
+
 ### Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 
 ```lua
