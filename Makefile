@@ -1,4 +1,4 @@
-NVIM_EXEC ?= nvim
+NVIM ?= nvim
 TIMEOUT ?= timeout
 
 default: check test
@@ -10,10 +10,10 @@ default: check test
 	git clone --filter=blob:none https://github.com/nvim-mini/mini.test $@
 
 test: .deps
-	${NVIM_EXEC} --headless --noplugin -u ./test/init.lua -c "lua MiniTest.run()"
+	${NVIM} --headless --noplugin -u ./test/init.lua -c "lua MiniTest.run()"
 
 bench: .deps
-	@${TIMEOUT} 120 ${NVIM_EXEC} --headless --noplugin -u ./test/bench/init.lua -c "lua MiniTest.run()"
+	@${TIMEOUT} 120 ${NVIM} --headless --noplugin -u ./test/bench/init.lua -c "lua MiniTest.run()"
 
 check: check-fmt check-lua
 
