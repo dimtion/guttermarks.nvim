@@ -38,6 +38,16 @@ function M._register_m_keymap()
   end, { desc = "Set mark (with gutter update)" })
 end
 
+---Clear all signs and cache
+function M._clear()
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(bufnr) then
+      vim.api.nvim_buf_clear_namespace(bufnr, M._ns, 0, -1)
+    end
+  end
+  M._marks_cache = {}
+end
+
 ---Configure initial hooks to use the plugin.
 ---Call this function once or when the configuration changes
 ---Overrides the default configuration with the provided config passed as a parameter
@@ -48,31 +58,33 @@ function M.setup(opts)
   M.config = vim.tbl_deep_extend("force", require("guttermarks.config"), opts)
 
   M._ns = vim.api.nvim_create_namespace("gutter_marks")
-
-  -- Clear signs and cache
-  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.api.nvim_buf_is_loaded(bufnr) then
-      vim.api.nvim_buf_clear_namespace(bufnr, M._ns, 0, -1)
-    end
-  end
-  M._marks_cache = {}
+  M._clear()
 
   M._au = vim.api.nvim_create_augroup("GutterMarks", { clear = true })
-  M.is_enabled = true
 
   vim.api.nvim_set_hl(0, M.config.local_mark.highlight_group, { default = true })
   vim.api.nvim_set_hl(0, M.config.global_mark.highlight_group, { default = true })
   vim.api.nvim_set_hl(0, M.config.special_mark.highlight_group, { default = true })
 
   vim.api.nvim_create_autocmd(M.config.autocmd_triggers, {
+    desc = "Refresh GutterMarks on config.autocmd_triggers",
     group = M._au,
     callback = function()
       vim.schedule(M.refresh)
     end,
   })
 
+  vim.api.nvim_create_autocmd("BufDelete", {
+    desc = "Clear GutterMarks cache on buffer delete",
+    group = M._au,
+    callback = function(ev)
+      M._marks_cache[ev.buf] = nil
+    end,
+  })
+
   if M.config.local_mark.enabled or M.config.global_mark.enabled then
     vim.api.nvim_create_autocmd("CmdlineLeave", {
+      desc = "Refresh GutterMarks on CmdlineLeave",
       group = M._au,
       callback = function()
         vim.schedule(function()
@@ -82,20 +94,17 @@ function M.setup(opts)
           end
         end)
       end,
-      desc = "Refresh GutterMarks on CmdlineLeave",
     })
-
-    M._register_m_keymap()
   end
 
   if M.config.special_mark.enabled then
     vim.api.nvim_create_autocmd("ModeChanged", {
+      desc = "Refresh GutterMarks on visual ModeChange",
       group = M._au,
       pattern = "[vV\x16]:*",
       callback = function()
         M.refresh()
       end,
-      desc = "Refresh GutterMarks on visual ModeChange",
     })
   end
 
@@ -109,13 +118,8 @@ function M.setup(opts)
     M.excluded_buftypes[ft] = true
   end
 
-  vim.api.nvim_create_autocmd("BufDelete", {
-    group = M._au,
-    callback = function(ev)
-      M._marks_cache[ev.buf] = nil
-    end,
-    desc = "Clear GutterMarks cache on buffer delete",
-  })
+  -- Default to enable when configuring plugin
+  M.enable(true)
 end
 
 ---Refresh marks in current buffer
@@ -172,12 +176,7 @@ function M.enable(is_enabled)
     end
     M.refresh()
   else
-    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-      if vim.api.nvim_buf_is_loaded(bufnr) then
-        vim.api.nvim_buf_clear_namespace(bufnr, M._ns, 0, -1)
-        M._marks_cache[bufnr] = nil
-      end
-    end
+    M._clear()
     pcall(vim.keymap.del, "n", "m")
   end
 end

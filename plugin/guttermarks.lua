@@ -3,10 +3,6 @@ if vim.g.loaded_guttermarks == 1 then
 end
 vim.g.loaded_guttermarks = 1
 
-if not require("guttermarks").is_enabled then
-  require("guttermarks").setup()
-end
-
 local function guttermarks_command(opts)
   local subcommand = opts.fargs[1]
 
@@ -42,3 +38,7 @@ vim.api.nvim_create_user_command("GutterMarks", guttermarks_command, {
   desc = "GutterMarks plugin commands",
   complete = guttermarks_complete,
 })
+
+if require("guttermarks").config == nil then
+  require("guttermarks").setup()
+end
