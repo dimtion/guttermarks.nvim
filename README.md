@@ -121,7 +121,7 @@ vim.api.nvim_set_hl(0, "GutterMarksGlobal", { fg = "#ff0000", bold = true })
 vim.api.nvim_set_hl(0, "GutterMarksSpecial", { fg = "#00ff00", italic = true })
 ```
 
-## Advanced configuration
+## Advanced Configuration
 
 ### Enable Special Marks (disabled by default)
 
@@ -130,6 +130,28 @@ vim.api.nvim_set_hl(0, "GutterMarksSpecial", { fg = "#00ff00", italic = true })
 ```lua
 require("guttermarks").setup({
   special_mark = { enabled = true },
+})
+```
+
+### Enable _Extra_ Special Marks
+By default, even with `special_mark` enabled, some _extra_ special marks are not
+enabled, those are `"{", "}", "(", ")"` marks which move with every cusor
+movement. To avoid refreshing the gutter at each movement those are disabled by
+default. However, they can be re-enabled manually with the following config:
+
+```lua
+require("guttermarks").setup({
+  special_mark = {
+    enabled = true,
+    marks = { "'", "^", ".", "[", "]", "<", ">", '"', "`", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "{", "}", "(", ")" },
+  },
+  autocmd_triggers = {
+    "BufEnter",
+    "BufWritePost",
+    "TextChanged",
+    "TextChangedI",
+    "CursorMoved",
+  },
 })
 ```
 
@@ -157,7 +179,7 @@ require("guttermarks").setup({
 })
 ```
 
-### Function passed for sign
+### Function Passed For Sign
 
 ```lua
 require("guttermarks").setup({
