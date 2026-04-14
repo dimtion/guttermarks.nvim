@@ -9,6 +9,7 @@ local child = MiniTest.new_child_neovim()
 local new_buf = function()
   child.bo.ft = "json"
   child.type_keys("iab<cr>cd<cr>ef<esc>gg")
+  return child.api.nvim_get_current_buf()
 end
 
 local T = MiniTest.new_set({
@@ -83,6 +84,23 @@ T["enable()"] = function()
 
   child.lua([[ M.enable(true) ]])
   eq(#helpers.get_gutter(child), 1)
+end
+
+T["enable() update all buffers"] = function()
+  child.lua([[ M.enable(false) ]])
+  local buf_a = new_buf()
+  child.type_keys("ggj0")
+  child.type_keys({ "ma" })
+
+  child.type_keys({ ":split<cr>", ":enew<cr>" })
+  local buf_b = new_buf()
+  child.type_keys("ggj0")
+  child.type_keys({ "mb" })
+
+  child.lua([[ M.enable(true) ]])
+
+  eq(#helpers.get_gutter(child, buf_a), 1)
+  eq(#helpers.get_gutter(child, buf_b), 1)
 end
 
 T["enable(false) clears signs in all loaded buffers"] = function()

@@ -40,9 +40,9 @@ end
 
 ---Clear all signs and cache
 function M._clear()
-  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.api.nvim_buf_is_loaded(bufnr) then
-      vim.api.nvim_buf_clear_namespace(bufnr, M._ns, 0, -1)
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(buf) then
+      vim.api.nvim_buf_clear_namespace(buf, M._ns, 0, -1)
     end
   end
   M._marks_cache = {}
@@ -69,8 +69,10 @@ function M.setup(opts)
   vim.api.nvim_create_autocmd(M.config.autocmd_triggers, {
     desc = "Refresh GutterMarks on config.autocmd_triggers",
     group = M._au,
-    callback = function()
-      vim.schedule(M.refresh)
+    callback = function(o)
+      vim.schedule(function()
+        M._refresh_buf(o.buf)
+      end)
     end,
   })
 
@@ -86,11 +88,11 @@ function M.setup(opts)
     vim.api.nvim_create_autocmd("CmdlineLeave", {
       desc = "Refresh GutterMarks on CmdlineLeave",
       group = M._au,
-      callback = function()
+      callback = function(o)
         vim.schedule(function()
           local cmdline = vim.fn.histget("cmd", -1)
           if cmdline:match("^ma") or cmdline:match("^delm") then
-            M.refresh()
+            M._refresh_buf(o.buf)
           end
         end)
       end,
@@ -102,8 +104,8 @@ function M.setup(opts)
       desc = "Refresh GutterMarks on visual ModeChange",
       group = M._au,
       pattern = "[vV\x16]:*",
-      callback = function()
-        M.refresh()
+      callback = function(o)
+        M._refresh_buf(o.buf)
       end,
     })
   end
@@ -122,9 +124,31 @@ function M.setup(opts)
   M.enable(true)
 end
 
----Refresh marks in current buffer
+---Refresh marks
 ---@return boolean false if nothing done
-function M.refresh()
+function M.refresh(opts)
+  opts = opts or { buf = 0 }
+  if opts.buf == 0 then
+    local buf = vim.api.nvim_get_current_buf()
+    return M._refresh_buf(buf)
+  end
+
+  if opts.buf == -1 then
+    local changed = false
+    for buf in ipairs(vim.api.nvim_list_bufs()) do
+      if vim.api.nvim_buf_is_loaded(buf) then
+        changed = M._refresh_buf(buf) or changed
+      end
+    end
+    return changed
+  end
+
+  return M._refresh_buf(opts.buf)
+end
+
+---Refresh marks in single buffer
+---@return boolean false if nothing done
+function M._refresh_buf(buf)
   if not M.is_enabled then
     return false
   end
@@ -133,16 +157,15 @@ function M.refresh()
     return false
   end
 
-  local bufnr = vim.api.nvim_get_current_buf()
   local utils = require("guttermarks.utils")
-  local marks = utils.get_buffer_marks(bufnr, M.config)
+  local marks = utils.get_buffer_marks(buf, M.config)
 
-  local cached_marks = M._marks_cache[bufnr]
+  local cached_marks = M._marks_cache[buf]
   if cached_marks and utils.marks_equal(marks, cached_marks) then
     return true
   end
 
-  vim.api.nvim_buf_clear_namespace(bufnr, M._ns, 0, -1)
+  vim.api.nvim_buf_clear_namespace(buf, M._ns, 0, -1)
 
   for _, mark in ipairs(marks) do
     local sign_config = M.config[mark.type].sign
@@ -154,14 +177,14 @@ function M.refresh()
       sign_text = sign_config or mark.mark
     end
 
-    vim.api.nvim_buf_set_extmark(bufnr, M._ns, mark.line - 1, 0, {
+    vim.api.nvim_buf_set_extmark(buf, M._ns, mark.line - 1, 0, {
       sign_text = sign_text,
       sign_hl_group = M.config[mark.type].highlight_group,
       priority = M.config[mark.type].priority,
     })
   end
 
-  M._marks_cache[bufnr] = marks
+  M._marks_cache[buf] = marks
 
   return true
 end
@@ -174,7 +197,7 @@ function M.enable(is_enabled)
     if M.config.local_mark.enabled or M.config.global_mark.enabled then
       M._register_m_keymap()
     end
-    M.refresh()
+    M.refresh({ buf = -1 })
   else
     M._clear()
     pcall(vim.keymap.del, "n", "m")

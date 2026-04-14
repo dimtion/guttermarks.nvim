@@ -14,12 +14,12 @@ M.alphabet_upper = {
     { "N" }, { "O" }, { "P" }, { "Q" }, { "R" }, { "S" }, { "T" }, { "U" }, { "V" }, { "W" }, { "X" }, { "Y" }, { "Z" },
 }
 
-M.get_gutter = function(child)
+M.get_gutter = function(child, buf)
   local ns = child.api.nvim_get_namespaces()["gutter_marks"]
-  local bufnr = child.api.nvim_get_current_buf()
+  buf = buf or child.api.nvim_get_current_buf()
   MiniTest.expect.no_equality(ns, nil)
-  MiniTest.expect.no_equality(bufnr, nil)
-  local gutter = child.api.nvim_buf_get_extmarks(bufnr, ns, 0, -1, {
+  MiniTest.expect.no_equality(buf, nil)
+  local gutter = child.api.nvim_buf_get_extmarks(buf, ns, 0, -1, {
     details = true,
   })
   return gutter
