@@ -162,9 +162,7 @@ function M.refresh(opts)
   if opts.buf == -1 then
     local changed = false
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-      if vim.api.nvim_buf_is_valid(buf) then
-        changed = M._refresh_buf(buf) or changed
-      end
+      changed = M._refresh_buf(buf) or changed
     end
     return changed
   end
@@ -176,6 +174,10 @@ end
 ---@return boolean false if nothing done
 function M._refresh_buf(buf)
   if not M.is_enabled then
+    return false
+  end
+
+  if not vim.api.nvim_buf_is_valid(buf) then
     return false
   end
 
