@@ -179,7 +179,7 @@ function M._refresh_buf(buf)
     return false
   end
 
-  if M.excluded_buftypes[vim.bo.bt] or M.excluded_filetypes[vim.bo.ft] then
+  if M.excluded_buftypes[vim.bo[buf].bt] or M.excluded_filetypes[vim.bo[buf].ft] then
     return false
   end
 
