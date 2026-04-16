@@ -177,7 +177,7 @@ function M._refresh_buf(buf)
     return false
   end
 
-  if not vim.api.nvim_buf_is_valid(buf) then
+  if not vim.api.nvim_buf_is_loaded(buf) then
     return false
   end
 
