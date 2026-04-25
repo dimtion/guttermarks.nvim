@@ -167,4 +167,12 @@ T["(force) refresh()"] = function()
   eq(#helpers.get_gutter(child), 1)
 end
 
+T["refresh() on wiped buffer returns false without error"] = function()
+  local buf = child.lua_get("vim.api.nvim_create_buf(false, true)")
+  child.api.nvim_buf_delete(buf, { force = true })
+
+  local result = child.lua_get("M.refresh({ buf = " .. buf .. " })")
+  eq(result, false)
+end
+
 return T
