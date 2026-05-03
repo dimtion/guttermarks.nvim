@@ -2,19 +2,11 @@ local M = {}
 
 ---Action to toggle (add or delete) a mark at current cursor position
 ---or specified position
----@param mark number|nil - mark char
+---@param mark string|nil - mark char
 ---@param bufnr number|nil - buffer number to use (default to current buffer)
 ---@param cursor_pos [integer, integer]|nil # (row, col) tuple - mark position to use (default to cursor position)
 M.toggle_mark = function(mark, bufnr, cursor_pos)
-  if mark == nil then
-    local utils = require("guttermarks.utils")
-    local input = vim.fn.getchar()
-    mark = type(input) == "number" and vim.fn.nr2char(input) or input
-
-    if not utils.is_letter(mark) then
-      return
-    end
-  end
+  mark = mark or vim.fn.getcharstr()
 
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   local line, col = unpack(cursor_pos or vim.api.nvim_win_get_cursor(0))
@@ -49,6 +41,27 @@ M.delete_mark = function(bufnr, line)
       vim.api.nvim_del_mark(m.mark:sub(2))
     end
   end
+  require("guttermarks").refresh()
+end
+
+---Action to delete a specified mark in current buffer
+---or specified buffer
+---@param mark string|nil - mark  to use (default to current buffer)
+---@param bufnr number|nil - buffer number to use (default to current buffer)
+function M.delete_specified_mark(mark, bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  local utils = require("guttermarks.utils")
+
+  mark = mark or vim.fn.getcharstr()
+
+  if utils.is_lower(mark) then
+    vim.api.nvim_buf_del_mark(bufnr, mark)
+  elseif utils.is_upper(mark) then
+    vim.api.nvim_del_mark(mark)
+  else
+    return
+  end
+
   require("guttermarks").refresh()
 end
 
