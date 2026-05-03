@@ -7,10 +7,11 @@ local M = {}
 ---@param cursor_pos [integer, integer]|nil # (row, col) tuple - mark position to use (default to cursor position)
 M.toggle_mark = function(mark, bufnr, cursor_pos)
   if mark == nil then
+    local utils = require("guttermarks.utils")
     local input = vim.fn.getchar()
     mark = type(input) == "number" and vim.fn.nr2char(input) or input
 
-    if not M.is_letter(mark) then
+    if not utils.is_letter(mark) then
       return
     end
   end
@@ -56,15 +57,16 @@ end
 ---@param bufnr number|nil - buffer number to use (default to current buffer)
 function M.delete_all_marks(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
+  local utils = require("guttermarks.utils")
 
   for _, m in ipairs(vim.fn.getmarklist(bufnr)) do
-    if M.is_lower(m.mark:sub(2)) then
+    if utils.is_lower(m.mark:sub(2)) then
       vim.api.nvim_buf_del_mark(bufnr, m.mark:sub(2))
     end
   end
 
   for _, m in ipairs(vim.fn.getmarklist()) do
-    if m.pos[1] == bufnr and M.is_upper(m.mark:sub(2)) then
+    if m.pos[1] == bufnr and utils.is_upper(m.mark:sub(2)) then
       vim.api.nvim_del_mark(m.mark:sub(2))
     end
   end
