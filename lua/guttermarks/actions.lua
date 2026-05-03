@@ -1,5 +1,34 @@
 local M = {}
 
+--Action to toggle (add or delete) a mark at current cursor position
+--or specified position
+--@param mark number|nil - mark char
+---@param bufnr number|nil - buffer number to use (default to current buffer)
+---@param cursor_pos [integer, integer]|nil # (row, col) tuple - mark position to use (default to cursor position)
+M.toggle_mark = function(mark, bufnr, cursor_pos)
+  if mark == nil then
+    local input = vim.fn.getchar()
+    mark = type(input) == "number" and vim.fn.nr2char(input) or input
+
+    if not M.is_letter(mark) then
+      return
+    end
+  end
+
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  local line, col = unpack(cursor_pos or vim.api.nvim_win_get_cursor(0))
+
+  local pos = vim.api.nvim_buf_get_mark(bufnr, mark)
+  local row, _ = unpack(pos)
+  if row ~= line then
+    vim.api.nvim_buf_set_mark(bufnr, mark, line, col, {})
+  else
+    vim.api.nvim_buf_del_mark(bufnr, mark)
+  end
+
+  require("guttermarks").refresh()
+end
+
 ---Action to delete a mark at current cursor position
 ---or selected position
 ---@param bufnr number|nil - buffer number to use (default to current buffer)
