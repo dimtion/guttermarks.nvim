@@ -1,5 +1,27 @@
 local M = {}
 
+---Action to toggle (add or delete) a mark at current cursor position
+---or specified position
+---@param mark string|nil - mark char
+---@param bufnr number|nil - buffer number to use (default to current buffer)
+---@param cursor_pos [integer, integer]|nil # (row, col) tuple - mark position to use (default to cursor position)
+M.toggle_mark = function(mark, bufnr, cursor_pos)
+  mark = mark or vim.fn.getcharstr()
+
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  local line, col = unpack(cursor_pos or vim.api.nvim_win_get_cursor(0))
+
+  local pos = vim.api.nvim_buf_get_mark(bufnr, mark)
+  local row, _ = unpack(pos)
+  if row ~= line then
+    vim.api.nvim_buf_set_mark(bufnr, mark, line, col, {})
+  else
+    vim.api.nvim_buf_del_mark(bufnr, mark)
+  end
+
+  require("guttermarks").refresh()
+end
+
 ---Action to delete a mark at current cursor position
 ---or selected position
 ---@param bufnr number|nil - buffer number to use (default to current buffer)
@@ -16,6 +38,48 @@ M.delete_mark = function(bufnr, line)
 
   for _, m in ipairs(vim.fn.getmarklist()) do
     if m.pos[1] == bufnr and m.pos[2] == line and m.mark:match("^'[A-Z]") then
+      vim.api.nvim_del_mark(m.mark:sub(2))
+    end
+  end
+  require("guttermarks").refresh()
+end
+
+---Action to delete a specified mark in current buffer
+---or specified buffer
+---@param mark string|nil - mark  to use (default to current buffer)
+---@param bufnr number|nil - buffer number to use (default to current buffer)
+function M.delete_specified_mark(mark, bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  local utils = require("guttermarks.utils")
+
+  mark = mark or vim.fn.getcharstr()
+
+  if utils.is_lower(mark) then
+    vim.api.nvim_buf_del_mark(bufnr, mark)
+  elseif utils.is_upper(mark) then
+    vim.api.nvim_del_mark(mark)
+  else
+    return
+  end
+
+  require("guttermarks").refresh()
+end
+
+---Action to delete all marks in current buffer
+---or selected buffer
+---@param bufnr number|nil - buffer number to use (default to current buffer)
+function M.delete_all_marks(bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  local utils = require("guttermarks.utils")
+
+  for _, m in ipairs(vim.fn.getmarklist(bufnr)) do
+    if utils.is_lower(m.mark:sub(2)) then
+      vim.api.nvim_buf_del_mark(bufnr, m.mark:sub(2))
+    end
+  end
+
+  for _, m in ipairs(vim.fn.getmarklist()) do
+    if m.pos[1] == bufnr and utils.is_upper(m.mark:sub(2)) then
       vim.api.nvim_del_mark(m.mark:sub(2))
     end
   end
