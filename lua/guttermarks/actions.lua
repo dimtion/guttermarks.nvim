@@ -1,8 +1,8 @@
 local M = {}
 
---Action to toggle (add or delete) a mark at current cursor position
---or specified position
---@param mark number|nil - mark char
+---Action to toggle (add or delete) a mark at current cursor position
+---or specified position
+---@param mark number|nil - mark char
 ---@param bufnr number|nil - buffer number to use (default to current buffer)
 ---@param cursor_pos [integer, integer]|nil # (row, col) tuple - mark position to use (default to cursor position)
 M.toggle_mark = function(mark, bufnr, cursor_pos)
